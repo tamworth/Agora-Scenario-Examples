@@ -9,6 +9,7 @@ import UIKit
 import AgoraRtcKit
 
 class SmallClassCreateController: BaseViewController {
+    var syncUtil: SceneSyncUtil? = nil
     private lazy var randomNameView: LiveRandomNameView = {
         let view = LiveRandomNameView()
         return view
@@ -166,7 +167,7 @@ class SmallClassCreateController: BaseViewController {
     private func onTapStartLiveButton() {
         let roomInfo = LiveRoomInfo(roomName: randomNameView.text)
         let params = JSONObject.toJson(roomInfo)
-        SyncUtil.joinScene(id: roomInfo.roomId, userId: roomInfo.userId, property: params, success: { result in
+        syncUtil?.joinScene(id: roomInfo.roomId, userId: roomInfo.userId, property: params, success: { result in
             self.startLiveHandler(result: result)
         })
     }
@@ -175,11 +176,13 @@ class SmallClassCreateController: BaseViewController {
         LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
         let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
         
-        NetworkManager.shared.generateToken(channelName: channelName ?? "", uid: UserInfo.userId) {
+        NetworkManager.shared.generateToken(channelName: channelName ?? "", uid: UserInfo.userId) { [weak self] in
+            guard let sself = self else {return}
             let livePlayerVC = SmallClassController(channelName: channelName ?? "",
                                                           userId: "\(UserInfo.userId)",
-                                                          agoraKit: self.agoraKit)
-            self.navigationController?.pushViewController(livePlayerVC, animated: true)
+                                                          agoraKit: sself.agoraKit)
+            livePlayerVC.syncUtil = sself.syncUtil
+            sself.navigationController?.pushViewController(livePlayerVC, animated: true)
         }
     }
     

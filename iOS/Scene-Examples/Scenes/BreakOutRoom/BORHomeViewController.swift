@@ -9,6 +9,8 @@ import UIKit
 import Agora_Scene_Utils
 
 class BORHomeViewController: BaseViewController {
+    lazy var syncUtil: SceneSyncUtil = SceneSyncUtil()
+
     private lazy var tableView: AGETableView = {
         let view = AGETableView()
         view.rowHeight = 58
@@ -40,7 +42,17 @@ class BORHomeViewController: BaseViewController {
     }
     
     private func getData() {
-        SyncUtil.fetchAll { objects in
+        guard syncUtil.inited else {
+            syncUtil.initSyncManager(sceneId: "BORHomeViewController") { [weak self] in
+                guard self?.syncUtil.inited ?? false else {
+                    return
+                }
+                self?.getData()
+            }
+            return
+        }
+        
+        syncUtil.fetchAll { objects in
             ToastView.hidden()
             self.tableView.endRefreshing()
             print("result == \(objects.compactMap{ $0.toJson() })")
@@ -69,6 +81,7 @@ class BORHomeViewController: BaseViewController {
     @objc
     private func onTapAddRoomButton() {
         let createRoomVC = BORCreateRoomController()
+        createRoomVC.syncUtil = syncUtil
         navigationController?.pushViewController(createRoomVC, animated: true)
     }
 }
@@ -77,11 +90,12 @@ extension BORHomeViewController: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = dataArray[indexPath.item]
         let params = JSONObject.toJson(item)
-        SyncUtil.joinScene(id: item.id, userId: item.userId, property: params) { result in
+        syncUtil.joinScene(id: item.id, userId: item.userId, property: params) { result in
             let channelName = result.getPropertyWith(key: "id", type: String.self) as? String
             let ownerId = result.getPropertyWith(key: "userId", type: String.self) as? String
             NetworkManager.shared.generateToken(channelName: channelName ?? "") {
                 let roomDetailVC = BORRoomDetailController(channelName: channelName ?? "", ownerId: ownerId ?? "")
+                roomDetailVC.syncUtil = self.syncUtil
                 self.navigationController?.pushViewController(roomDetailVC, animated: true)
             }
         } fail: { error in

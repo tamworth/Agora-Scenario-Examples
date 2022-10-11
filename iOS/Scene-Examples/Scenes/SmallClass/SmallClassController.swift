@@ -11,6 +11,7 @@ import Fastboard
 import Agora_Scene_Utils
 
 class SmallClassController: BaseViewController {
+    var syncUtil: SceneSyncUtil? = nil
     private lazy var fastRoom: FastRoom = {
         let config = FastRoomConfiguration(appIdentifier: BOARD_APP_ID,
                                            roomUUID: BOARD_ROOM_UUID,
@@ -134,9 +135,9 @@ class SmallClassController: BaseViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel()
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).document().unsubscribe(key: "")
-        SyncUtil.leaveScene(id: channleName)
+        syncUtil?.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
+        syncUtil?.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).document().unsubscribe(key: "")
+        syncUtil?.leaveScene(id: channleName)
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -191,7 +192,7 @@ class SmallClassController: BaseViewController {
     }
     
    private func getUserStatus() {
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { results in
+       syncUtil?.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { results in
             let datas = results.compactMap({ $0.toJson() })
                 .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0 )})
                 .sorted(by: { $0.timestamp < $1.timestamp })
@@ -202,7 +203,7 @@ class SmallClassController: BaseViewController {
     }
     
     public func eventHandler() {
-        SyncUtil.scene(id: channleName)?.subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION, onCreated: nil, onUpdated: { object in
+        syncUtil?.scene(id: channleName)?.subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION, onCreated: nil, onUpdated: { object in
             guard let userInfo = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson()) else { return }
             if let index = self.dataArray.firstIndex(where: { $0.userId == userInfo.userId }) {
                 self.dataArray[index] = userInfo
@@ -218,7 +219,7 @@ class SmallClassController: BaseViewController {
         })
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
+        syncUtil?.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
             
         }, onUpdated: { object in
             
@@ -237,7 +238,7 @@ class SmallClassController: BaseViewController {
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.syncUtil?.scene(id: self?.channleName ?? "")?.deleteScenes()
                 self?.navigationController?.popViewController(animated: true)
             }
 
@@ -274,7 +275,7 @@ class SmallClassController: BaseViewController {
         fastRoom.joinRoom()
                 
         let params = JSONObject.toJson(model)
-        SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: params, success: { object in
+        syncUtil?.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: params, success: { object in
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.getUserStatus()
             }
@@ -285,7 +286,7 @@ class SmallClassController: BaseViewController {
     
     private func leaveChannel() {
         guard let model = dataArray.first(where: { $0.userId == UserInfo.uid }) else { return }
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+        syncUtil?.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .document(id: model.objectId ?? "")
             .delete(success: { objects in
                 LogUtils.log(message: "\(objects.count)", level: .info)
@@ -305,7 +306,7 @@ class SmallClassController: BaseViewController {
         model.isEnableVideo = sender.isSelected
         dataArray[index] = model
         
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+        syncUtil?.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .document(id: model.objectId ?? "")
             .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
         
@@ -319,7 +320,7 @@ class SmallClassController: BaseViewController {
         model.isEnableAudio = sender.isSelected
         dataArray[index] = model
         
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+        syncUtil?.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .document(id: model.objectId ?? "")
             .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
         

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		B5DF969B7ED11BACA57C6864 /* Pods_Scene_Examples.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AED837A3EC68965AC33FE2E6 /* Pods_Scene_Examples.framework */; };
+		DD5470AA28F5915E0047BA25 /* EducationRoomListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5470A928F5915E0047BA25 /* EducationRoomListController.swift */; };
+		DD8377F828F57ED100AA945B /* SmallClassRoomListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8377F728F57ED100AA945B /* SmallClassRoomListController.swift */; };
+		DD8377FA28F57F8400AA945B /* SceneSyncUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8377F928F57F8400AA945B /* SceneSyncUtil.swift */; };
 		E7000B232877D67100248345 /* RethinkSyncManager+ISyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000B212877D67100248345 /* RethinkSyncManager+ISyncManager.swift */; };
 		E7000B242877D67100248345 /* RethinkSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000B222877D67100248345 /* RethinkSyncManager.swift */; };
 		E710AE2F27A0F23300124356 /* ChangeRoomBgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E710AE2E27A0F23300124356 /* ChangeRoomBgView.swift */; };
@@ -157,6 +160,9 @@
 		4EAC22A0ABCEA5BE7ED7FCFA /* Pods-Agora-ScreenShare-Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Agora-ScreenShare-Extension.release.xcconfig"; path = "Target Support Files/Pods-Agora-ScreenShare-Extension/Pods-Agora-ScreenShare-Extension.release.xcconfig"; sourceTree = "<group>"; };
 		AED837A3EC68965AC33FE2E6 /* Pods_Scene_Examples.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Scene_Examples.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C99DD6A332A83A34EF8B5943 /* Pods-Scene-Examples.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Scene-Examples.release.xcconfig"; path = "Target Support Files/Pods-Scene-Examples/Pods-Scene-Examples.release.xcconfig"; sourceTree = "<group>"; };
+		DD5470A928F5915E0047BA25 /* EducationRoomListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EducationRoomListController.swift; sourceTree = "<group>"; };
+		DD8377F728F57ED100AA945B /* SmallClassRoomListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallClassRoomListController.swift; sourceTree = "<group>"; };
+		DD8377F928F57F8400AA945B /* SceneSyncUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneSyncUtil.swift; sourceTree = "<group>"; };
 		E7000B212877D67100248345 /* RethinkSyncManager+ISyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RethinkSyncManager+ISyncManager.swift"; sourceTree = "<group>"; };
 		E7000B222877D67100248345 /* RethinkSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RethinkSyncManager.swift; sourceTree = "<group>"; };
 		E710AE2E27A0F23300124356 /* ChangeRoomBgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeRoomBgView.swift; sourceTree = "<group>"; };
@@ -365,6 +371,7 @@
 				E7EDBCA727A0F94800E763A6 /* VoiceChatRoom */,
 				E79C2620273B7B5C00909CD4 /* LiveBroadcasting */,
 				E79BEF612741FCEB009FA838 /* LivePK */,
+				DD8377F928F57F8400AA945B /* SceneSyncUtil.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -721,6 +728,7 @@
 			children = (
 				E7BE807928E2D676007E3A84 /* SmallClassCreateController.swift */,
 				E7BE807A28E2D676007E3A84 /* SmallClassController.swift */,
+				DD8377F728F57ED100AA945B /* SmallClassRoomListController.swift */,
 			);
 			path = SmallClass;
 			sourceTree = "<group>";
@@ -749,6 +757,7 @@
 		E7DB5B3A28DB0B1200C6C181 /* Education1v1 */ = {
 			isa = PBXGroup;
 			children = (
+				DD5470A928F5915E0047BA25 /* EducationRoomListController.swift */,
 				E7DB5B3B28DB0B1200C6C181 /* EducationCreateController.swift */,
 				E7DB5B3C28DB0B1200C6C181 /* EducationController.swift */,
 			);
@@ -956,6 +965,7 @@
 				E757E6A4281AAE6B0017D5B9 /* RtmSyncManager+Info.swift in Sources */,
 				E757E6A3281AAE6B0017D5B9 /* RtmSyncManager+Handle.swift in Sources */,
 				E79BEF8A274644A9009FA838 /* BORLiveModel.swift in Sources */,
+				DD8377F828F57ED100AA945B /* SmallClassRoomListController.swift in Sources */,
 				E79BEF45273E4D99009FA838 /* LiveGiftModel.swift in Sources */,
 				E79C264E273D062400909CD4 /* LiveRoomListCell.swift in Sources */,
 				E7ECC56927E81A9E00EFA778 /* BaseNavigationController.swift in Sources */,
@@ -967,6 +977,7 @@
 				E7DB5B4728DC09B200C6C181 /* LiveShoppingDetailViewController.swift in Sources */,
 				E79C2644273BE7C000909CD4 /* LiveSettingView.swift in Sources */,
 				E7BE807C28E2D676007E3A84 /* SmallClassController.swift in Sources */,
+				DD8377FA28F57F8400AA945B /* SceneSyncUtil.swift in Sources */,
 				E79BEF3B273D21FD009FA838 /* LiveChatView.swift in Sources */,
 				E7499C2C2770537C00E799FF /* MessageCell.swift in Sources */,
 				E79BEF3F273D3EF0009FA838 /* LiveToolView.swift in Sources */,
@@ -1040,6 +1051,7 @@
 				E7C6323028B387FE0030E506 /* InteractiveBlogView.swift in Sources */,
 				E7EDBCC027A2A4CA00E763A6 /* RTCRealTimeDataView.swift in Sources */,
 				E7C6323128B387FE0030E506 /* InteractiveBlogBannerView.swift in Sources */,
+				DD5470AA28F5915E0047BA25 /* EducationRoomListController.swift in Sources */,
 				E79C260F273B689B00909CD4 /* JSONObject.swift in Sources */,
 				E79C25DF273B67DB00909CD4 /* AppDelegate.swift in Sources */,
 				E79C260E273B689B00909CD4 /* AgoraExtension.swift in Sources */,
@@ -1217,7 +1229,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1243;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = 292LAU3ZVD;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Scene-Examples/Info.plist";
@@ -1237,7 +1249,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.6.201;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.scene.examples;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sheen.scene.examples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1255,7 +1267,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1243;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = 292LAU3ZVD;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Scene-Examples/Info.plist";
@@ -1275,7 +1287,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.6.201;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.scene.examples;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sheen.scene.examples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

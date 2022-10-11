@@ -42,6 +42,7 @@ struct MainModel {
     var title: String = ""
     var imageNmae: String = ""
     var sceneType: SceneType = .singleLive
+    var roomClassName: String? = nil
     
     static func mainDatas() -> [[MainModel]] {
         var dataArray = [[MainModel]]()
@@ -95,11 +96,13 @@ struct MainModel {
         model.title = "breakoutroom".localized
         model.imageNmae = "BreakoutRoom"
         model.sceneType = .breakoutRoom
+        model.roomClassName = "BORHomeViewController"
         tempArray.append(model)
         
         model = MainModel()
         model.title = "Education1v1".localized
         model.imageNmae = "BreakoutRoom"
+        model.roomClassName = "EducationRoomListController"
         model.sceneType = .Education1v1
         tempArray.append(model)
         
@@ -107,6 +110,7 @@ struct MainModel {
         model.title = "Small Class".localized
         model.imageNmae = "BreakoutRoom"
         model.sceneType = .smallClass
+        model.roomClassName = "SmallClassRoomListController"
         tempArray.append(model)
         dataArray.append(tempArray)
         
@@ -161,7 +165,20 @@ extension MainViewController: AGECollectionViewDelegate {
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let sceneType = MainModel.mainDatas()[indexPath.section][indexPath.item].sceneType
+        let model = MainModel.mainDatas()[indexPath.section][indexPath.item]
+        
+        
+        if let nameSpace = NSStringFromClass(self.classForCoder).components(separatedBy: ".").first,
+           let className = model.roomClassName,
+           let cls = NSClassFromString("\(nameSpace).\(className)") as? UIViewController.Type
+        {
+            let vc = cls.init()
+            vc.title = model.title
+            self.navigationController?.pushViewController(vc, animated: true)
+            return
+        }
+        assert(false, "not implemented")
+        let sceneType = model.sceneType
         SyncUtil.initSyncManager(sceneId: sceneType.rawValue) {
             let model = MainModel.mainDatas()[indexPath.section][indexPath.item]
             if sceneType == .breakoutRoom {

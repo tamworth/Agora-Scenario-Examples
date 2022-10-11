@@ -11,6 +11,7 @@ import AgoraRtcKit
 import Agora_Scene_Utils
 
 class BORRoomDetailController: BaseViewController {
+    var syncUtil: SceneSyncUtil?
     private lazy var segmentView: SegmentView = {
         let segmentView = SegmentView(frame: CGRect(x: 0, y: 0, width: 300, height: 44), segmentStyle: .init(), titles: ["agjak", "gsaga", "agqgqwgg", "qweqwe", "gqwgb"])
         segmentView.style.indicatorStyle = .line
@@ -88,8 +89,8 @@ class BORRoomDetailController: BaseViewController {
         
         segmentView.titles = [channleName]
         
-        SyncUtil.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).get(success: { results in
-            SyncUtil.scene(id: self.id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().subscribe(key: "", onCreated: { result in
+        syncUtil?.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).get(success: { results in
+            self.syncUtil?.scene(id: self.id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().subscribe(key: "", onCreated: { result in
                 self.onCreated(result: result)
             }, onUpdated: { object in
                 self.onUpdated(object: object)
@@ -109,7 +110,7 @@ class BORRoomDetailController: BaseViewController {
         }, fail: { error in
             ToastView.show(text: error.message)
         })
-        SyncUtil.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().subscribe(key: "", onCreated: { result in
+        syncUtil?.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().subscribe(key: "", onCreated: { result in
             self.onCreated(result: result)
         }, onUpdated: { object in
             self.onUpdated(object: object)
@@ -153,14 +154,14 @@ class BORRoomDetailController: BaseViewController {
         super.viewWillDisappear(animated)
         agoraKit?.stopPreview()
         leaveChannel()
-        SyncUtil.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().unsubscribe(key: "")
-        SyncUtil.leaveScene(id: id)
+        syncUtil?.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().unsubscribe(key: "")
+        syncUtil?.leaveScene(id: id)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         guard ownerId == UserInfo.uid else { return }
-        SyncUtil.scene(id: id)?.delete(success: nil, fail: nil)
+        syncUtil?.scene(id: id)?.delete(success: nil, fail: nil)
     }
     
     private func setupUI() {
@@ -242,7 +243,7 @@ class BORRoomDetailController: BaseViewController {
             }
             let roomModel = BORSubRoomModel(subRoom: text)
             let roomParams = JSONObject.toJson(roomModel)
-            SyncUtil.scene(id: self?.id ?? "")?.collection(className: SYNC_COLLECTION_SUB_ROOM).add(data: roomParams, success: { object in
+            self?.syncUtil?.scene(id: self?.id ?? "")?.collection(className: SYNC_COLLECTION_SUB_ROOM).add(data: roomParams, success: { object in
                 
             }, fail: { error in
                 ToastView.show(text: error.message)

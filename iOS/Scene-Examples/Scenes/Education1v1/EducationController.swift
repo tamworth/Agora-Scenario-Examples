@@ -13,6 +13,7 @@ let BOARD_APP_ID: String = "283/VGiScM9Wiw2HJg"
 let BOARD_ROOM_UUID: String = "6d181120525e11ec89361798d9c15050"
 let BOARD_ROOM_TOKEN: String = "WHITEcGFydG5lcl9pZD15TFExM0tTeUx5VzBTR3NkJnNpZz0wZWIzMmY5M2IzMGUzZTBiMTQ4NzQ3NGVmZTRhNTlkNWM2MjY4ZjFjOmFrPXlMUTEzS1N5THlXMFNHc2QmY3JlYXRlX3RpbWU9MTYzODMzMjYwNTUwNiZleHBpcmVfdGltZT0xNjY5ODY4NjA1NTA2Jm5vbmNlPTE2MzgzMzI2MDU1MDYwMCZyb2xlPXJvb20mcm9vbUlkPTZkMTgxMTIwNTI1ZTExZWM4OTM2MTc5OGQ5YzE1MDUwJnRlYW1JZD05SUQyMFBRaUVldTNPNy1mQmNBek9n"
 class EducationController: BaseViewController {
+    var syncUtil: SceneSyncUtil?
     private lazy var fastRoom: FastRoom = {
         let config = FastRoomConfiguration(appIdentifier: BOARD_APP_ID,
                                            roomUUID: BOARD_ROOM_UUID,
@@ -119,8 +120,8 @@ class EducationController: BaseViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel(uid: UserInfo.userId, channelName: channleName, isExit: true)
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
-        SyncUtil.leaveScene(id: channleName)
+        syncUtil?.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
+        syncUtil?.leaveScene(id: channleName)
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -203,7 +204,7 @@ class EducationController: BaseViewController {
         }
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
+        syncUtil?.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
             
         }, onUpdated: { object in
             
@@ -221,7 +222,7 @@ class EducationController: BaseViewController {
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.syncUtil?.scene(id: self?.channleName ?? "")?.deleteScenes()
                 self?.navigationController?.popViewController(animated: true)
             }
 

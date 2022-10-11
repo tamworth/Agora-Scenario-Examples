@@ -8,6 +8,7 @@
 import UIKit
 
 class BORCreateRoomController: BaseViewController {
+    var syncUtil: SceneSyncUtil?
     var createRoomFinished: (() -> Void)?
     private lazy var textField: UITextField = {
         let textField = UITextField()
@@ -85,10 +86,11 @@ class BORCreateRoomController: BaseViewController {
         itemModel.backgroundId = String(format: "cover/portrait%02d", Int.random(in: 1...2))
         let params = JSONObject.toJson(itemModel)
         LogUtils.log(message: "params == \(params)", level: .info)
-        SyncUtil.joinScene(id: itemModel.id, userId: UserInfo.uid, property: params) { objects in
+        syncUtil?.joinScene(id: itemModel.id, userId: UserInfo.uid, property: params) { objects in
             NetworkManager.shared.generateToken(channelName: self.textField.text ?? "") {
                 let roomDetailVC = BORRoomDetailController(channelName: self.textField.text ?? "",
                                                            ownerId: UserInfo.uid)
+                roomDetailVC.syncUtil = self.syncUtil
                 self.navigationController?.pushViewController(roomDetailVC, animated: true)
             }
             ToastView.hidden()
