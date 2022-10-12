@@ -177,7 +177,7 @@ extension MainViewController: AGECollectionViewDelegate {
             self.navigationController?.pushViewController(vc, animated: true)
             return
         }
-        assert(false, "not implemented")
+//        assert(false, "not implemented")
         let sceneType = model.sceneType
         SyncUtil.initSyncManager(sceneId: sceneType.rawValue) {
             let model = MainModel.mainDatas()[indexPath.section][indexPath.item]

@@ -10,6 +10,7 @@ import AgoraRtcKit
 //import AgoraSyncManager
 
 class LiveBroadcastingCreateController: BaseViewController {
+    lazy var service: LiveBroadcastingService = LiveBroadcastingService()
     private lazy var randomNameView: LiveRandomNameView = {
         let view = LiveRandomNameView()
         return view
@@ -166,24 +167,37 @@ class LiveBroadcastingCreateController: BaseViewController {
     }
     @objc
     private func onTapStartLiveButton() {
-        let roomInfo = LiveRoomInfo(roomName: randomNameView.text)
-        let params = JSONObject.toJson(roomInfo)
-        SyncUtil.joinScene(id: roomInfo.roomId, userId: roomInfo.userId, property: params, success: { result in
-            self.startLiveHandler(result: result)
-        })
-    }
-    
-    private func startLiveHandler(result: IObject) {
-        LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
-        let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
-        
-        NetworkManager.shared.generateToken(channelName: channelName ?? "") {
-            let livePlayerVC = LiveBroadcastingController(channelName: channelName ?? "",
-                                                          userId: "\(UserInfo.userId)",
-                                                          agoraKit: self.agoraKit)
-            self.navigationController?.pushViewController(livePlayerVC, animated: true)
+//        let roomInfo = LiveRoomInfo(roomName: randomNameView.text)
+//        let params = JSONObject.toJson(roomInfo)
+//        SyncUtil.joinScene(id: roomInfo.roomId, userId: roomInfo.userId, property: params, success: { result in
+//            self.startLiveHandler(result: result)
+//        })
+        service.join(roomName: randomNameView.text) {[weak self] (error, channelName, userId) in
+            guard let sself = self,
+                    error == nil,
+                    let channelName = channelName,
+                    let userId = userId else {
+                return
+            }
+            
+            let livePlayerVC = LiveBroadcastingController(channelName: channelName,
+                                                          userId: userId,
+                                                          agoraKit: sself.agoraKit)
+            sself.navigationController?.pushViewController(livePlayerVC, animated: true)
         }
     }
+    
+//    private func startLiveHandler(result: IObject) {
+//        LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+//        let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
+//
+//        NetworkManager.shared.generateToken(channelName: channelName ?? "") {
+//            let livePlayerVC = LiveBroadcastingController(channelName: channelName ?? "",
+//                                                          userId: "\(UserInfo.userId)",
+//                                                          agoraKit: self.agoraKit)
+//            self.navigationController?.pushViewController(livePlayerVC, animated: true)
+//        }
+//    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)

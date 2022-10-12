@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		B5DF969B7ED11BACA57C6864 /* Pods_Scene_Examples.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AED837A3EC68965AC33FE2E6 /* Pods_Scene_Examples.framework */; };
 		DD5470AA28F5915E0047BA25 /* EducationRoomListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5470A928F5915E0047BA25 /* EducationRoomListController.swift */; };
+		DD5470B128F6E6140047BA25 /* LiveBroadcastingServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5470B028F6E6140047BA25 /* LiveBroadcastingServiceDelegate.swift */; };
 		DD8377F828F57ED100AA945B /* SmallClassRoomListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8377F728F57ED100AA945B /* SmallClassRoomListController.swift */; };
 		DD8377FA28F57F8400AA945B /* SceneSyncUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8377F928F57F8400AA945B /* SceneSyncUtil.swift */; };
 		E7000B232877D67100248345 /* RethinkSyncManager+ISyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000B212877D67100248345 /* RethinkSyncManager+ISyncManager.swift */; };
@@ -161,6 +162,7 @@
 		AED837A3EC68965AC33FE2E6 /* Pods_Scene_Examples.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Scene_Examples.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C99DD6A332A83A34EF8B5943 /* Pods-Scene-Examples.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Scene-Examples.release.xcconfig"; path = "Target Support Files/Pods-Scene-Examples/Pods-Scene-Examples.release.xcconfig"; sourceTree = "<group>"; };
 		DD5470A928F5915E0047BA25 /* EducationRoomListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EducationRoomListController.swift; sourceTree = "<group>"; };
+		DD5470B028F6E6140047BA25 /* LiveBroadcastingServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveBroadcastingServiceDelegate.swift; sourceTree = "<group>"; };
 		DD8377F728F57ED100AA945B /* SmallClassRoomListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallClassRoomListController.swift; sourceTree = "<group>"; };
 		DD8377F928F57F8400AA945B /* SceneSyncUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneSyncUtil.swift; sourceTree = "<group>"; };
 		E7000B212877D67100248345 /* RethinkSyncManager+ISyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RethinkSyncManager+ISyncManager.swift"; sourceTree = "<group>"; };
@@ -664,6 +666,7 @@
 		E79C2620273B7B5C00909CD4 /* LiveBroadcasting */ = {
 			isa = PBXGroup;
 			children = (
+				DD5470B028F6E6140047BA25 /* LiveBroadcastingServiceDelegate.swift */,
 				E79C2625273B7BDA00909CD4 /* LiveBroadcastingCreateController.swift */,
 				E79BEF30273D0EA4009FA838 /* LiveBroadcastingController.swift */,
 				E79C2622273B7B7F00909CD4 /* Models */,
@@ -953,6 +956,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E7000B232877D67100248345 /* RethinkSyncManager+ISyncManager.swift in Sources */,
+				DD5470B128F6E6140047BA25 /* LiveBroadcastingServiceDelegate.swift in Sources */,
 				E757E6B4281AAE6B0017D5B9 /* Extensions.swift in Sources */,
 				E79BEF37273D15D6009FA838 /* Screen.swift in Sources */,
 				E7000B242877D67100248345 /* RethinkSyncManager.swift in Sources */,
