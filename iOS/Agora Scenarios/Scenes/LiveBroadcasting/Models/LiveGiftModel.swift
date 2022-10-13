@@ -20,17 +20,16 @@ struct LiveGiftModel: Codable {
         /// 遮挡卡
         case shelter = 5
     }
-    
+
     var iconName: String?
     var title: String = ""
     var coin: Int = 0
     var gifName: String = ""
     var userId: String = "\(UserInfo.userId)"
     var giftType: GiftType = .delay
-    
+
     var objectId: String?
-    
-    
+
     static func createGiftData() -> [LiveGiftModel] {
         var dataArray = [LiveGiftModel]()
         var model = LiveGiftModel(iconName: "gift-dang".localized,

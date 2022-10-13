@@ -5,18 +5,19 @@
 //  Created by zhaoyongqiang on 2021/11/11.
 //
 
-import UIKit
 import AgoraRtcKit
+import UIKit
 
 struct LiveSettingModel {
     enum LiveSettingType {
         case resolution, frameRate, bitRate
     }
+
     var title: String = ""
     var desc: String = ""
     var sliderValue: Float = 0
     var settingType: LiveSettingType = .resolution
-    
+
     var resolutionTitle: CGSize {
         switch desc {
         case "240 X 240": return AgoraVideoDimension240x240
@@ -26,6 +27,7 @@ struct LiveSettingModel {
         default: return AgoraVideoDimension240x240
         }
     }
+
     var frameRate: AgoraVideoFrameRate {
         switch desc {
         case "15": return AgoraVideoFrameRate.fps15
@@ -34,7 +36,7 @@ struct LiveSettingModel {
         default: return AgoraVideoFrameRate.fps15
         }
     }
-    
+
     static func settingsData() -> [LiveSettingModel] {
         var dataArray = [LiveSettingModel]()
         var model = LiveSettingModel(title: "Resolution".localized, desc: "480 X 840", settingType: .resolution)
@@ -45,7 +47,7 @@ struct LiveSettingModel {
         dataArray.append(model)
         return dataArray
     }
-    
+
     static func resolutionData() -> [LiveSettingModel] {
         var dataArray = [LiveSettingModel]()
         var model = LiveSettingModel(title: "", desc: "240 X 240", settingType: .resolution)
@@ -58,7 +60,7 @@ struct LiveSettingModel {
         dataArray.append(model)
         return dataArray
     }
-    
+
     static func frameRateData() -> [LiveSettingModel] {
         var dataArray = [LiveSettingModel]()
         var model = LiveSettingModel(title: "", desc: "15", settingType: .frameRate)

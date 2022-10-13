@@ -17,17 +17,18 @@ class CDNInvitationViewCell: UITableViewCell {
     private let inviteButton = UIButton()
     weak var delegate: CDNInvitationCellDelegate?
     private var info = Info.empty
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setup()
         commonInit()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setup() {
         inviteButton.backgroundColor = .white
         inviteButton.layer.borderWidth = 2
@@ -37,38 +38,38 @@ class CDNInvitationViewCell: UITableViewCell {
         inviteButton.setTitle("邀请", for: .normal)
         headImageView.layer.cornerRadius = 20
         headImageView.layer.masksToBounds = true
-        
+
         contentView.addSubview(headImageView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(inviteButton)
-        
+
         headImageView.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         inviteButton.translatesAutoresizingMaskIntoConstraints = false
-        
+
         headImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16).isActive = true
         headImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         headImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
         headImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        
+
         nameLabel.leftAnchor.constraint(equalTo: headImageView.rightAnchor, constant: 10).isActive = true
         nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        
+
         inviteButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
         inviteButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
         inviteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
     }
-    
+
     func commonInit() {
         inviteButton.addTarget(self,
                                action: #selector(buttonTap(_:)),
                                for: .touchUpInside)
     }
-    
+
     @objc func buttonTap(_ sender: UIButton) {
         delegate?.cell(self, on: info.idnex)
     }
-    
+
     func udpate(info: Info) {
         self.info = info
         headImageView.image = UIImage(named: info.imageName)
@@ -81,14 +82,14 @@ extension CDNInvitationViewCell {
     enum InviteButtonState {
         case none, inviting, availableInvite
     }
-    
+
     struct Info {
         let idnex: Int
         let title: String
         let imageName: String
         let isInvited: Bool
         let userId: String
-        
+
         static var empty: Info {
             return Info(idnex: 0,
                         title: "",

@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/11/10.
 //
 
-import UIKit
 import AVFoundation
+import UIKit
 
 public let cl_screenWidht = UIScreen.main.bounds.width
 public let cl_screenHeight = UIScreen.main.bounds.height
@@ -15,26 +15,28 @@ class AlertManager: NSObject {
         var view: UIView?
         var index: Int = 0
     }
+
     enum AlertPosition {
         case center
         case bottom
     }
-    
+
     private static var vc: UIViewController?
     private static var containerView: UIView?
     private static var currentPosition: AlertPosition = .center
     private static var viewCache: [AlertViewCache] = []
     private static var bottomAnchor: NSLayoutConstraint?
-    
+
     public static func show(view: UIView,
                             alertPostion: AlertPosition = .center,
-                            didCoverDismiss: Bool = true) {
+                            didCoverDismiss: Bool = true)
+    {
         let index = viewCache.isEmpty ? 0 : viewCache.count
         viewCache.append(AlertViewCache(view: view, index: index))
         currentPosition = alertPostion
         if vc == nil {
             containerView = UIButton(frame: CGRect(x: 0, y: 0, width: cl_screenWidht, height: cl_screenHeight))
-            containerView?.backgroundColor = UIColor(red: 0.0/255, green: 0.0/255, blue: 0.0/255, alpha: 0.0)
+            containerView?.backgroundColor = UIColor(red: 0.0 / 255, green: 0.0 / 255, blue: 0.0 / 255, alpha: 0.0)
         }
         if didCoverDismiss {
             (containerView as? UIButton)?.addTarget(self, action: #selector(tapView), for: .touchUpInside)
@@ -46,7 +48,7 @@ class AlertManager: NSObject {
         if alertPostion == .center {
             view.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
             view.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        }else{
+        } else {
             bottomAnchor = view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
             view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
             view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
@@ -63,39 +65,39 @@ class AlertManager: NSObject {
         } else {
             showAlertPostion(alertPostion: alertPostion, view: view)
         }
-        //注册键盘出现通知
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name:  UIApplication.keyboardWillShowNotification, object: nil)
-        
-        //注册键盘隐藏通知
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name:  UIApplication.keyboardWillHideNotification, object: nil)
+        // 注册键盘出现通知
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
+
+        // 注册键盘隐藏通知
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
     }
 
     private static func showAlertPostion(alertPostion: AlertPosition, view: UIView) {
         containerView?.layoutIfNeeded()
         if alertPostion == .center {
             showCenterView(view: view)
-        }else{
+        } else {
             bottomAnchor?.constant = view.frame.height
             bottomAnchor?.isActive = true
             containerView?.layoutIfNeeded()
             showBottomView(view: view)
         }
     }
-    
-    private static func showCenterView(view: UIView){
+
+    private static func showCenterView(view: UIView) {
         if !viewCache.isEmpty {
             viewCache.forEach({ $0.view?.alpha = 0 })
         }
         UIView.animate(withDuration: 0.25, animations: {
-            containerView?.backgroundColor = UIColor(red: 0.0/255,
-                                                     green: 0.0/255,
-                                                     blue: 0.0/255,
+            containerView?.backgroundColor = UIColor(red: 0.0 / 255,
+                                                     green: 0.0 / 255,
+                                                     blue: 0.0 / 255,
                                                      alpha: 0.5)
             view.alpha = 1.0
         })
     }
-    
-    private static func showBottomView(view: UIView){
+
+    private static func showBottomView(view: UIView) {
         if !viewCache.isEmpty {
             viewCache.forEach({ $0.view?.alpha = 0 })
         }
@@ -103,10 +105,10 @@ class AlertManager: NSObject {
         bottomAnchor?.constant = 0
         bottomAnchor?.isActive = true
         UIView.animate(withDuration: 0.25, animations: {
-            containerView?.backgroundColor = UIColor(red: 0.0/255,
-                                                    green: 0.0/255,
-                                                    blue: 0.0/255,
-                                                    alpha: 0.5)
+            containerView?.backgroundColor = UIColor(red: 0.0 / 255,
+                                                     green: 0.0 / 255,
+                                                     blue: 0.0 / 255,
+                                                     alpha: 0.5)
             containerView?.superview?.layoutIfNeeded()
         })
     }
@@ -116,8 +118,8 @@ class AlertManager: NSObject {
             containerView?.layoutIfNeeded()
         })
     }
-    
-    static func hiddenView(all: Bool = true, completion: (() -> Void)? = nil){
+
+    static func hiddenView(all: Bool = true, completion: (() -> Void)? = nil) {
         if vc == nil {
             completion?()
             return
@@ -129,16 +131,16 @@ class AlertManager: NSObject {
         }
         UIView.animate(withDuration: 0.25, animations: {
             if all || viewCache.isEmpty {
-                containerView?.backgroundColor = UIColor(red: 255.0/255,
-                                                         green: 255.0/255,
-                                                         blue: 255.0/255,
+                containerView?.backgroundColor = UIColor(red: 255.0 / 255,
+                                                         green: 255.0 / 255,
+                                                         blue: 255.0 / 255,
                                                          alpha: 0.0)
                 containerView?.layoutIfNeeded()
             }
             if currentPosition == .center {
                 viewCache.last?.view?.alpha = 0
             }
-        }, completion: { (_) in
+        }, completion: { _ in
             if all || viewCache.isEmpty {
                 vc?.dismiss(animated: false, completion: completion)
                 vc = nil
@@ -148,15 +150,15 @@ class AlertManager: NSObject {
             }
         })
     }
-    
+
     @objc
-    private static func tapView(){
+    private static func tapView() {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: UInt64(0.1))) {
             self.hiddenView()
         }
     }
-    
-    private static var originFrame:CGRect = .zero
+
+    private static var originFrame: CGRect = .zero
     // 键盘显示
     @objc private static func keyboardWillShow(notification: Notification) {
         let keyboardHeight = (notification.userInfo?["UIKeyboardBoundsUserInfoKey"] as? CGRect)?.height
@@ -168,6 +170,7 @@ class AlertManager: NSObject {
             containerView?.frame.origin.y = y
         }
     }
+
     // 键盘隐藏
     @objc private static func keyboardWillHide(notification: Notification) {
         UIView.animate(withDuration: 0.25) {
@@ -184,31 +187,31 @@ extension UIViewController {
     static var keyWindow: UIWindow? {
         // Get connected scenes
         return UIApplication.shared.connectedScenes
-        // Keep only active scenes, onscreen and visible to the user
+            // Keep only active scenes, onscreen and visible to the user
             .filter { $0.activationState == .foregroundActive }
-        // Keep only the first `UIWindowScene`
+            // Keep only the first `UIWindowScene`
             .first(where: { $0 is UIWindowScene })
-        // Get its associated windows
+            // Get its associated windows
             .flatMap({ $0 as? UIWindowScene })?.windows
-        // Finally, keep only the key window
+            // Finally, keep only the key window
             .first(where: \.isKeyWindow)
     }
+
     static func cl_topViewController(_ viewController: UIViewController? = nil) -> UIViewController? {
         let viewController = viewController ?? keyWindow?.rootViewController
-        
+
         if let navigationController = viewController as? UINavigationController,
-            !navigationController.viewControllers.isEmpty
+           !navigationController.viewControllers.isEmpty
         {
-            return self.cl_topViewController(navigationController.viewControllers.last)
-            
+            return cl_topViewController(navigationController.viewControllers.last)
+
         } else if let tabBarController = viewController as? UITabBarController,
-            let selectedController = tabBarController.selectedViewController
+                  let selectedController = tabBarController.selectedViewController
         {
-            return self.cl_topViewController(selectedController)
-            
+            return cl_topViewController(selectedController)
+
         } else if let presentedController = viewController?.presentedViewController {
-            return self.cl_topViewController(presentedController)
-            
+            return cl_topViewController(presentedController)
         }
         return viewController
     }

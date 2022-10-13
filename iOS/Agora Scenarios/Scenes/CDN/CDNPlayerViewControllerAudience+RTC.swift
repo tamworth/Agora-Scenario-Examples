@@ -5,12 +5,12 @@
 //  Created by ZYP on 2021/12/28.
 //
 
-import UIKit
 import AgoraRtcKit
+import UIKit
 
 extension CDNPlayerViewControllerAudience {
     var videoSize: CGSize { .init(width: 640, height: 360) }
-    
+
     func initMediaPlayer(useAgoraCDN: Bool) {
         let rtcConfig = AgoraRtcEngineConfig()
         rtcConfig.appId = config.appId
@@ -23,23 +23,22 @@ extension CDNPlayerViewControllerAudience {
             LogUtils.log(message: "use AgoraCDN", level: .info)
             mediaPlayer.open(pullUrlString,
                              startPos: 0)
-        }
-        else {
+        } else {
             LogUtils.log(message: "not use AgoraCDN", level: .info)
             mediaPlayer.open(pullUrlString, startPos: 0)
         }
         LogUtils.log(message: pullUrlString, level: .info)
     }
-    
+
     func joinRtc() {
         let config = AgoraRtcEngineConfig()
         config.appId = config.appId
-        
+
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: config,
                                                   delegate: self)
         agoraKit.setChannelProfile(.liveBroadcasting)
         agoraKit.setClientRole(.broadcaster)
-        
+
         let videoConfig = AgoraVideoEncoderConfiguration(size: videoSize,
                                                          frameRate: .fps15,
                                                          bitrate: 700,
@@ -48,9 +47,9 @@ extension CDNPlayerViewControllerAudience {
         agoraKit.enableVideo()
         agoraKit.setVideoEncoderConfiguration(videoConfig)
         setupLocalVideo(view: mainView.renderViewLocal)
-        
+
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
-        
+
         let ret = agoraKit.joinChannel(byToken: KeyCenter.Token,
                                        channelId: self.config.sceneId,
                                        info: nil,
@@ -61,11 +60,11 @@ extension CDNPlayerViewControllerAudience {
             return
         }
     }
-    
+
     func leaveRtc() { /** 离开RTC方式 **/
         agoraKit.leaveChannel(nil)
     }
-    
+
     func setupLocalVideo(view: UIView) {
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = 0
@@ -74,7 +73,7 @@ extension CDNPlayerViewControllerAudience {
         agoraKit.setupLocalVideo(videoCanvas)
         agoraKit.startPreview()
     }
-    
+
     func setupRemoteVideo(view: UIView, uid: UInt) {
         view.backgroundColor = .gray
         let videoCanvas = AgoraRtcVideoCanvas()
@@ -83,7 +82,7 @@ extension CDNPlayerViewControllerAudience {
         videoCanvas.renderMode = .hidden
         agoraKit.setupRemoteVideo(videoCanvas)
     }
-    
+
     func destroyRtc() {
         if mode == .pull {
             if mediaPlayer != nil {
@@ -91,26 +90,27 @@ extension CDNPlayerViewControllerAudience {
                 agoraKit.destroyMediaPlayer(mediaPlayer)
                 mediaPlayer = nil
             }
-        }
-        else {
+        } else {
             agoraKit.leaveChannel(nil)
         }
     }
 }
 
 // MARK: - AgoraRtcEngineDelegate
+
 extension CDNPlayerViewControllerAudience: AgoraRtcEngineDelegate {
-    
     func rtcEngine(_ engine: AgoraRtcEngineKit,
                    didJoinChannel channel: String,
                    withUid uid: UInt,
-                   elapsed: Int) {
+                   elapsed: Int)
+    {
         LogUtils.log(message: "didJoinChannel channel: \(channel), uid: \(uid) ", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit,
                    didJoinedOfUid uid: UInt,
-                   elapsed: Int) {
+                   elapsed: Int)
+    {
         LogUtils.log(message: "didJoinedOfUid", level: .info)
         mainView.setRemoteViewHidden(hidden: false)
         setupRemoteVideo(view: mainView.renderViewRemote,
@@ -119,10 +119,12 @@ extension CDNPlayerViewControllerAudience: AgoraRtcEngineDelegate {
 }
 
 // MARK: - AgoraRtcMediaPlayerDelegate
+
 extension CDNPlayerViewControllerAudience: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol,
                              didChangedTo state: AgoraMediaPlayerState,
-                             error: AgoraMediaPlayerError) {
+                             error: AgoraMediaPlayerError)
+    {
         LogUtils.log(message: "agoraRtcMediaPlayer didChangedTo \(state.rawValue) \(error.rawValue)", level: .info)
         if state == .openCompleted {
             LogUtils.log(message: "openCompleted", level: .info)

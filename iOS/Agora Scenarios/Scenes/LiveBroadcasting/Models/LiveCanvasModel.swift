@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/11/11.
 //
 
-import UIKit
 import AgoraRtcKit
+import UIKit
 
 class LiveCanvasModel {
     /// 显示直播的画布
@@ -15,21 +15,20 @@ class LiveCanvasModel {
     var channelName: String = ""
     /// 加入channel
     var connection: AgoraRtcConnection?
-    
-    
+
     static func createCanvas(uid: UInt) -> AgoraRtcVideoCanvas {
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = uid
         canvas.renderMode = .hidden
         return canvas
     }
-    
+
     static func createConnection(channelName: String, uid: UInt) -> AgoraRtcConnection {
         let connection = AgoraRtcConnection()
         connection.channelId = channelName
         connection.localUid = uid
         return connection
     }
-    
-    required init() { }
+
+    required init() {}
 }

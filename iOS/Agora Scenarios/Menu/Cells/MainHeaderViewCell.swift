@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2022/6/17.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class MainHeaderViewCell: UICollectionReusableView {
     private lazy var titleLabel: AGELabel = {
@@ -14,15 +14,17 @@ class MainHeaderViewCell: UICollectionReusableView {
         label.text = "社交娱乐"
         return label
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -30,7 +32,7 @@ class MainHeaderViewCell: UICollectionReusableView {
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
         titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
     }
-    
+
     func setTitle(title: String) {
         titleLabel.text = title
     }

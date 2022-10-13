@@ -22,29 +22,32 @@ class BORCreateRoomController: BaseViewController {
         textField.placeholder = "Please_enter_a_room_name".localized
         return textField
     }()
+
     private lazy var createRoomButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "create_room"), for: .normal)
         button.addTarget(self, action: #selector(onTapCreateRoomButton(_:)), for: .touchUpInside)
         return button
     }()
+
     private var channelName: String?
-    
+
     init(channelName: String? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.channelName = channelName
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "create_room".localized
         setupUI()
     }
-    
+
     private func setupUI() {
         view.backgroundColor = .white
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -55,15 +58,15 @@ class BORCreateRoomController: BaseViewController {
         textField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 40).isActive = true
         textField.heightAnchor.constraint(equalToConstant: 40).isActive = true
         textField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -40).isActive = true
-        
+
         createRoomButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         createRoomButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -40).isActive = true
     }
-    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         textField.resignFirstResponder()
     }
-    
+
     @objc
     private func onTapCreateRoomButton(_ sender: UIButton) {
         let text = textField.text ?? ""

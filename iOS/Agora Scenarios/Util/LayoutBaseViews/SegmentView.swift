@@ -27,11 +27,9 @@ public struct SegmentViewStyle {
     public var normalBorderColor = UIColor.clear
     public var minimumWidth: CGFloat?
     public init() {}
-
 }
 
 @IBDesignable public class SegmentView: UIControl {
-
     public struct TitleElement: Equatable {
         public let title: String
         public let selectedImage: UIImage?
@@ -53,14 +51,15 @@ public struct SegmentViewStyle {
             reloadLayout()
         }
     }
-    public override var frame: CGRect {
+
+    override public var frame: CGRect {
         didSet {
             guard frame.size != oldValue.size else { return }
             reloadLayout()
         }
     }
 
-    public override var bounds: CGRect {
+    override public var bounds: CGRect {
         didSet {
             guard bounds.size != oldValue.size else { return }
             reloadLayout()
@@ -72,10 +71,9 @@ public struct SegmentViewStyle {
             reloadData(animated: false, sendAction: false)
         }
     }
+
     public var titleElements: [TitleElement] {
-        get {
-            return _titleElements
-        }
+        return _titleElements
     }
 
     @IBInspectable public var titles: [String] {
@@ -110,6 +108,7 @@ public struct SegmentViewStyle {
         ind.layer.masksToBounds = true
         return ind
     }()
+
     private let selectedLabelsMaskView: UIView = {
         let cover = UIView()
         cover.layer.masksToBounds = true
@@ -117,7 +116,8 @@ public struct SegmentViewStyle {
     }()
 
     // MARK: - life cycle
-    public convenience override init(frame: CGRect) {
+
+    override public convenience init(frame: CGRect) {
         self.init(frame: frame, segmentStyle: SegmentViewStyle(), titles: [])
     }
 
@@ -126,8 +126,8 @@ public struct SegmentViewStyle {
     }
 
     public init(frame: CGRect, segmentStyle: SegmentViewStyle, titles: [String]) {
-        self.style = segmentStyle
-        self._titleElements = titles.map({ TitleElement(title: $0)})
+        style = segmentStyle
+        _titleElements = titles.map({ TitleElement(title: $0) })
         super.init(frame: frame)
         shareInit()
     }
@@ -137,9 +137,9 @@ public struct SegmentViewStyle {
         setRichTextTitles(richTextTitles)
     }
 
-    required public init?(coder aDecoder: NSCoder) {
-        self.style = SegmentViewStyle()
-        self._titleElements = []
+    public required init?(coder aDecoder: NSCoder) {
+        style = SegmentViewStyle()
+        _titleElements = []
         super.init(coder: aDecoder)
         shareInit()
     }
@@ -163,16 +163,14 @@ public struct SegmentViewStyle {
                 break
             }
         }
-
     }
 
     public func setRichTextTitles(_ titles: [TitleElement]) {
-        self._titleElements = titles
+        _titleElements = titles
     }
 
     private func setSelectIndex(index: Int, animated: Bool, sendAction: Bool, forceUpdate: Bool = false) {
-
-        guard (index != selectIndex || forceUpdate), index >= 0, index < titleLabels.count else { return }
+        guard index != selectIndex || forceUpdate, index >= 0, index < titleLabels.count else { return }
         preLabel?.textColor = style.normalTitleColor
         preLabel?.layer.borderColor = style.normalBorderColor.cgColor
         let currentLabel = titleLabels[index]
@@ -208,7 +206,7 @@ public struct SegmentViewStyle {
         if style.indicatorStyle == .cover {
             indicator.frame = frame
         } else {
-            let x = style.indicatorWidth > 0 ? frame.origin.x + (frame.width - style.indicatorWidth ) / 2 : frame.origin.x
+            let x = style.indicatorWidth > 0 ? frame.origin.x + (frame.width - style.indicatorWidth) / 2 : frame.origin.x
             let w = style.indicatorWidth > 0 ? style.indicatorWidth : frame.width
             let h = style.indicatorHeight > 0 ? style.indicatorHeight : frame.height
             let y = self.frame.height - h - 6
@@ -216,7 +214,6 @@ public struct SegmentViewStyle {
             indicator.frame = rect
         }
         selectedLabelsMaskView.frame = frame
-
     }
 
     // Data handler
@@ -238,17 +235,17 @@ public struct SegmentViewStyle {
     private func reloadData(animated: Bool = true, sendAction: Bool = true) {
         clearData()
 
-        guard titles.count > 0  else {
+        guard titles.count > 0 else {
             return
         }
         // Set titles
-        let font  = style.titleFont
+        let font = style.titleFont
         var titleX: CGFloat = 0.0
         var titleH = font.lineHeight
         if titleElements.contains(where: { $0.normalImage != nil }) || titleElements.contains(where: { $0.selectedImage != nil }) {
             titleH = titleH + style.titlePendingVertical
         }
-        let titleY: CGFloat = ( bounds.height - titleH)/2
+        let titleY: CGFloat = (bounds.height - titleH) / 2
         let coverH: CGFloat = font.lineHeight + style.titlePendingVertical
 
         selectedLabelsMaskView.backgroundColor = UIColor.black
@@ -256,7 +253,7 @@ public struct SegmentViewStyle {
         selectedLabelsMaskView.isUserInteractionEnabled = true
 
         let toToSize: (String) -> CGFloat = { text in
-            let result =  (text as NSString).boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: 0.0), options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil).width
+            let result = (text as NSString).boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: 0.0), options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil).width
 
             if let minWidth = self.style.minimumWidth, result < minWidth {
                 return minWidth
@@ -265,17 +262,16 @@ public struct SegmentViewStyle {
         }
 
         for (index, item) in titleElements.enumerated() {
-
             var titlePendingHorizontal = style.titlePendingHorizontal
 
-            //if we are using images, then add a bit of extra horizontal spacing
+            // if we are using images, then add a bit of extra horizontal spacing
             if item.normalImage != nil || item.selectedImage != nil {
                 titlePendingHorizontal = titlePendingHorizontal + font.lineHeight
             }
 
             let titleW = toToSize(item.title) + titlePendingHorizontal * 2
 
-            titleX = (titleLabels.last?.frame.maxX ?? 0 ) + style.titleMargin
+            titleX = (titleLabels.last?.frame.maxX ?? 0) + style.titleMargin
             let rect = CGRect(x: titleX, y: titleY, width: titleW, height: titleH)
 
             let backLabel = UILabel(frame: .zero)
@@ -321,19 +317,17 @@ public struct SegmentViewStyle {
         } else {
             indicator.layer.cornerRadius = style.indicatorCornerRadius > 0 ? style.indicatorCornerRadius : 0
         }
-        selectedLabelsMaskView.layer.cornerRadius = coverH/2
+        selectedLabelsMaskView.layer.cornerRadius = coverH / 2
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(SegmentView.handleTapGesture(_:)))
         addGestureRecognizer(tapGesture)
 
         setSelectIndex(index: selectIndex, animated: animated, sendAction: sendAction, forceUpdate: true)
-
     }
 }
 
-extension SegmentView {
-
-    public var titleFont: UIFont {
+public extension SegmentView {
+    var titleFont: UIFont {
         get {
             return style.titleFont
         }
@@ -342,7 +336,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var indicatorColor: UIColor {
+    @IBInspectable var indicatorColor: UIColor {
         get {
             return style.indicatorColor
         }
@@ -351,7 +345,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var titleMargin: CGFloat {
+    @IBInspectable var titleMargin: CGFloat {
         get {
             return style.titleMargin
         }
@@ -360,7 +354,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var titlePendingHorizontal: CGFloat {
+    @IBInspectable var titlePendingHorizontal: CGFloat {
         get {
             return style.titlePendingHorizontal
         }
@@ -369,7 +363,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var titlePendingVertical: CGFloat {
+    @IBInspectable var titlePendingVertical: CGFloat {
         get {
             return style.titlePendingVertical
         }
@@ -378,7 +372,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var minimumWidth: CGFloat {
+    @IBInspectable var minimumWidth: CGFloat {
         get {
             return style.minimumWidth ?? 0
         }
@@ -387,7 +381,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var normalTitleColor: UIColor {
+    @IBInspectable var normalTitleColor: UIColor {
         get {
             return style.normalTitleColor
         }
@@ -396,7 +390,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var selectedTitleColor: UIColor {
+    @IBInspectable var selectedTitleColor: UIColor {
         get {
             return style.selectedTitleColor
         }
@@ -405,7 +399,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var selectedBorderColor: UIColor {
+    @IBInspectable var selectedBorderColor: UIColor {
         get {
             return style.selectedBorderColor
         }
@@ -414,7 +408,7 @@ extension SegmentView {
         }
     }
 
-    @IBInspectable public var normalBorderColor: UIColor {
+    @IBInspectable var normalBorderColor: UIColor {
         get {
             return style.selectedBorderColor
         }
@@ -422,11 +416,10 @@ extension SegmentView {
             style.selectedBorderColor = newValue
         }
     }
-
 }
 
-extension UILabel {
-    @objc public func addToLeft(image: UIImage?) {
+public extension UILabel {
+    @objc func addToLeft(image: UIImage?) {
         let mutableAttributedString = NSMutableAttributedString()
         if let image = image {
             let attachment = NSTextAttachment()
@@ -436,15 +429,15 @@ extension UILabel {
                 size.height = bounds.height
                 size.width = size.height * bounds.width / bounds.height
             }
-            
-            attachment.bounds = CGRect(x: 0, y: (self.font.capHeight - size.height) / 2, width: image.size.width, height: image.size.height)
+
+            attachment.bounds = CGRect(x: 0, y: (font.capHeight - size.height) / 2, width: image.size.width, height: image.size.height)
             let attachmentStr = NSAttributedString(attachment: attachment)
             mutableAttributedString.append(attachmentStr)
         }
-        if let text = self.text {
-            let textString = NSAttributedString(string: text, attributes: [.font: self.font, .foregroundColor: self.textColor])
+        if let text = text {
+            let textString = NSAttributedString(string: text, attributes: [.font: font, .foregroundColor: textColor])
             mutableAttributedString.append(textString)
         }
-        self.attributedText = mutableAttributedString
+        attributedText = mutableAttributedString
     }
 }

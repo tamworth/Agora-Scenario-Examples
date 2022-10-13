@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/11/11.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 enum LiveToolType {
     case switch_camera
@@ -17,7 +17,7 @@ enum LiveToolType {
     case music
     case backgroundImage
     case real_time_data
-    
+
     var imageName: String {
         switch self {
         case .switch_camera: return "icon-rotate"
@@ -29,7 +29,7 @@ enum LiveToolType {
         case .real_time_data: return "icon-data"
         }
     }
-    
+
     var selectedImageName: String {
         switch self {
         case .switch_camera: return "icon-rotate"
@@ -41,7 +41,7 @@ enum LiveToolType {
         case .real_time_data: return "icon-data"
         }
     }
-    
+
     var title: String {
         switch self {
         case .switch_camera: return "Switch_Camera".localized
@@ -54,6 +54,7 @@ enum LiveToolType {
         }
     }
 }
+
 class LiveToolView: UIView {
     var onTapItemClosure: ((LiveToolType, Bool) -> Void)?
     private lazy var titleLabel: UILabel = {
@@ -63,11 +64,13 @@ class LiveToolView: UIView {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var lineView: UIView = {
         let view = UIView()
         view.backgroundColor = .lightGray
         return view
     }()
+
     private lazy var collectionViewLayout: AGECollectionView = {
         let view = AGECollectionView()
         view.itemSize = CGSize(width: 80, height: 100)
@@ -78,16 +81,18 @@ class LiveToolView: UIView {
         view.register(LiveToolViewCell.self, forCellWithReuseIdentifier: LiveToolViewCell.description())
         return view
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         updateToolType(type: [.switch_camera, .camera, .mic])
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func updateToolType(type: [LiveToolType], isSelected: Bool = false) {
         var datas = [LiveToolModel]()
         type.forEach({
@@ -101,7 +106,7 @@ class LiveToolView: UIView {
         })
         collectionViewLayout.dataArray = datas
     }
-    
+
     func updateStatus(type: LiveToolType, isSelected: Bool) {
         let index = collectionViewLayout.dataArray?.compactMap({ $0 as? LiveToolModel }).firstIndex(where: { $0.type == type }) ?? 0
         var datas = collectionViewLayout.dataArray
@@ -110,7 +115,7 @@ class LiveToolView: UIView {
         datas?[index] = model
         collectionViewLayout.dataArray = datas
     }
-    
+
     private func setupUI() {
         translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -120,20 +125,20 @@ class LiveToolView: UIView {
         layer.cornerRadius = 10
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
-        
+
         addSubview(titleLabel)
         addSubview(lineView)
         addSubview(collectionViewLayout)
-        
+
         widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
-        
+
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15).isActive = true
         lineView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         lineView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15).isActive = true
         lineView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
         lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        
+
         collectionViewLayout.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         collectionViewLayout.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -15).isActive = true
         collectionViewLayout.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
@@ -148,7 +153,7 @@ extension LiveToolView: AGECollectionViewDelegate {
         cell.setToolData(item: collectionViewLayout.dataArray?[indexPath.item])
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) as? LiveToolViewCell,
               let model = collectionViewLayout.dataArray?[indexPath.item] as? LiveToolModel else { return }
@@ -157,7 +162,6 @@ extension LiveToolView: AGECollectionViewDelegate {
     }
 }
 
-
 class LiveToolViewCell: UICollectionViewCell {
     private lazy var iconButton: UIButton = {
         let button = UIButton()
@@ -165,6 +169,7 @@ class LiveToolViewCell: UICollectionViewCell {
         button.isUserInteractionEnabled = false
         return button
     }()
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Switch_Camera".localized
@@ -172,33 +177,34 @@ class LiveToolViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
-    
+
     private var model: LiveToolModel?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         iconButton.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
+
         contentView.addSubview(iconButton)
         contentView.addSubview(titleLabel)
-        
+
         iconButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         iconButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        
+
         titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: iconButton.bottomAnchor, constant: 10).isActive = true
         titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
-    
+
     func setToolData(item: Any?) {
         guard let model = item as? LiveToolModel else { return }
         self.model = model
@@ -207,7 +213,7 @@ class LiveToolViewCell: UICollectionViewCell {
         iconButton.isSelected = model.isSelected
         titleLabel.text = model.title
     }
-    
+
     @discardableResult
     func updateButtonState() -> Bool {
         iconButton.isSelected = !iconButton.isSelected

@@ -5,25 +5,27 @@
 //  Created by zhaoyongqiang on 2022/8/16.
 //
 
-import UIKit
 import Agora_Scene_Utils
 import AgoraRtcKit
+import UIKit
 
 class InteractiveBlogBannerView: UIButton {
     var onTapInteractiveBlogBannerViewClosure: ((String) -> Void)?
     var onTapInteractiveBlogExitClosure: (() -> Void)?
-    
+
     private lazy var avatarImageView: AGEImageView = {
         let imageView = AGEImageView(imageName: "portrait06")
         imageView.cornerRadius = 18
         return imageView
     }()
+
     private lazy var onlineButton: AGEButton = {
         let button = AGEButton(style: .none, colorStyle: .white, fontStyle: .small)
         button.setImage(UIImage(named: "InteractiveBlog/blueBroadcaster"), for: .normal, postion: .right)
         button.setTitle("0/0", for: .normal)
         return button
     }()
+
     private lazy var statckView: UIStackView = {
         let stackView = UIStackView()
         stackView.alignment = .fill
@@ -32,6 +34,7 @@ class InteractiveBlogBannerView: UIButton {
         stackView.spacing = 10
         return stackView
     }()
+
     private lazy var exitButton: AGEButton = {
         let button = AGEButton(style: .filled(backgroundColor: UIColor(hex: "#364151")),
                                colorStyle: .white,
@@ -41,6 +44,7 @@ class InteractiveBlogBannerView: UIButton {
         button.cornerRadius = 18
         return button
     }()
+
     private lazy var raiseHandButton: AGEButton = {
         let button = AGEButton(style: .filled(backgroundColor: UIColor(hex: "#e1b66a")),
                                colorStyle: .white,
@@ -51,6 +55,7 @@ class InteractiveBlogBannerView: UIButton {
         button.isHidden = clientRole == .broadcaster
         return button
     }()
+
     private lazy var raiseListButton: AGEButton = {
         let button = AGEButton(style: .filled(backgroundColor: UIColor(hex: "#364151")),
                                colorStyle: .white,
@@ -61,6 +66,7 @@ class InteractiveBlogBannerView: UIButton {
         button.isHidden = clientRole == .audience
         return button
     }()
+
     private lazy var micButton: AGEButton = {
         let button = AGEButton(style: .filled(backgroundColor: UIColor(hex: "#364151")),
                                colorStyle: .white,
@@ -73,29 +79,30 @@ class InteractiveBlogBannerView: UIButton {
         button.isSelected = currentUserModel?.isEnableAudio ?? false
         return button
     }()
-    
+
     private var channelName: String = ""
     private var currentUserModel: InteractiveBlogUsersModel?
     private var agoraKit: AgoraRtcEngineKit?
     private var clientRole: AgoraClientRole = .broadcaster
-   
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-   
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupParams(channelName: String, model: InteractiveBlogUsersModel?, agoraKit: AgoraRtcEngineKit?, role: AgoraClientRole) {
         self.channelName = channelName
-        self.clientRole = role
-        self.currentUserModel = model
+        clientRole = role
+        currentUserModel = model
         self.agoraKit = agoraKit
         fetchUsers()
     }
-    
+
     func leave() {
         if clientRole == .broadcaster {
             leaveChannel()
@@ -106,14 +113,14 @@ class InteractiveBlogBannerView: UIButton {
             SyncUtil.leaveScene(id: channelName)
         }
     }
-    
+
     func checkRoom(channelName: String) {
         if channelName != self.channelName {
             leave()
             isHidden = true
         }
     }
-    
+
     private func fetchUsers() {
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_VOICE_USERS).get(success: { list in
             let users = list.compactMap({ JSONObject.toModel(InteractiveBlogUsersModel.self, value: $0.toJson()) }).sorted(by: { $0.timestamp < $1.timestamp })
@@ -124,14 +131,14 @@ class InteractiveBlogBannerView: UIButton {
             LogUtils.log(message: error.message, level: .error)
         })
     }
-    
+
     private func setupUI() {
         layer.cornerRadius = 28
         layer.masksToBounds = true
         heightAnchor.constraint(equalToConstant: 56).isActive = true
         backgroundColor = UIColor(hex: "#4e586a")
         addTarget(self, action: #selector(onTapSelfHandler), for: .touchUpInside)
-        
+
         addSubview(avatarImageView)
         addSubview(onlineButton)
         addSubview(statckView)
@@ -139,35 +146,35 @@ class InteractiveBlogBannerView: UIButton {
         statckView.addArrangedSubview(raiseHandButton)
         statckView.addArrangedSubview(raiseListButton)
         statckView.addArrangedSubview(micButton)
-        
+
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         onlineButton.translatesAutoresizingMaskIntoConstraints = false
         statckView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         avatarImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         avatarImageView.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
         avatarImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
         avatarImageView.widthAnchor.constraint(equalToConstant: 36).isActive = true
-        
+
         onlineButton.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 15).isActive = true
         onlineButton.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        
+
         statckView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true
         statckView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        
+
         exitButton.widthAnchor.constraint(equalToConstant: 36).isActive = true
         exitButton.heightAnchor.constraint(equalToConstant: 36).isActive = true
-        
+
         raiseHandButton.widthAnchor.constraint(equalTo: exitButton.widthAnchor).isActive = true
         raiseHandButton.heightAnchor.constraint(equalTo: exitButton.heightAnchor).isActive = true
-        
+
         raiseListButton.widthAnchor.constraint(equalTo: exitButton.widthAnchor).isActive = true
         raiseListButton.heightAnchor.constraint(equalTo: exitButton.heightAnchor).isActive = true
-        
+
         micButton.widthAnchor.constraint(equalTo: exitButton.widthAnchor).isActive = true
         micButton.heightAnchor.constraint(equalTo: exitButton.heightAnchor).isActive = true
     }
-    
+
     private func leaveChannel() {
         agoraKit?.disableAudio()
         agoraKit?.disableVideo()
@@ -178,13 +185,13 @@ class InteractiveBlogBannerView: UIButton {
             LogUtils.log(message: "leave channel: \(state)", level: .info)
         })
     }
-    
+
     @objc
     private func onTapSelfHandler() {
         isHidden = true
         onTapInteractiveBlogBannerViewClosure?(channelName)
     }
-    
+
     @objc
     private func onTapExitButton() {
         if clientRole == .broadcaster {
@@ -206,6 +213,7 @@ class InteractiveBlogBannerView: UIButton {
             onTapInteractiveBlogExitClosure?()
         }
     }
+
     @objc
     private func onTapRaiseHandtButton() {
         currentUserModel?.status = .request
@@ -214,11 +222,13 @@ class InteractiveBlogBannerView: UIButton {
             .update(id: currentUserModel?.objectId ?? "", data: params, success: nil, fail: nil)
         ToastView.show(text: "Request received. Please wait ...".localized)
     }
+
     @objc
     private func onTapRaiseListButton() {
         let view = InteractiveBlogRaiseListView(channelName: channelName)
         AlertManager.show(view: view, alertPostion: .bottom, didCoverDismiss: true)
     }
+
     @objc
     private func onTapMicButton(sender: AGEButton) {
         sender.isSelected = !sender.isSelected

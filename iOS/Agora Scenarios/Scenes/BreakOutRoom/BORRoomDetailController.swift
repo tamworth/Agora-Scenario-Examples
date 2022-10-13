@@ -5,10 +5,10 @@
 //  Created by zhaoyongqiang on 2021/10/29.
 //
 
-import UIKit
-import AgoraRtcKit
-//import AgoraSyncManager
+// import AgoraSyncManager
 import Agora_Scene_Utils
+import AgoraRtcKit
+import UIKit
 
 class BORRoomDetailController: BaseViewController {
     private lazy var segmentView: SegmentView = {
@@ -29,6 +29,7 @@ class BORRoomDetailController: BaseViewController {
         }
         return segmentView
     }()
+
     private lazy var videoView: AGECollectionView = {
         let view = AGECollectionView()
         let viewW = self.view.frame.width
@@ -41,6 +42,7 @@ class BORRoomDetailController: BaseViewController {
                       forCellWithReuseIdentifier: BORVideoRoomDetailCell.description())
         return view
     }()
+
     private lazy var voiceButton: UIButton = {
         let button = UIButton()
         button.setBackgroundImage(UIImage(systemName: "mic.circle"), for: .normal)
@@ -48,64 +50,66 @@ class BORRoomDetailController: BaseViewController {
         button.addTarget(self, action: #selector(onTapVoiceButton(sender:)), for: .touchUpInside)
         return button
     }()
+
     private var isJoined: Bool = false
     private var agoraKit: AgoraRtcEngineKit?
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
-       let config = AgoraRtcEngineConfig()
+        let config = AgoraRtcEngineConfig()
         config.appId = KeyCenter.AppId
         config.channelProfile = .liveBroadcasting
         config.areaCode = .global
         return config
     }()
+
     private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
-       let option = AgoraRtcChannelMediaOptions()
+        let option = AgoraRtcChannelMediaOptions()
         option.publishMicrophoneTrack = .of(true)
-        option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
+        option.clientRoleType = .of(Int32(AgoraClientRole.broadcaster.rawValue))
         return option
     }()
+
     private var channleName: String = ""
     private var ownerId: String = ""
     private var id: String = ""
     private var dataArray = [LiveCanvasModel]()
     private var homeDataArray = [BORLiveModel]()
-    
+
     init(channelName: String, ownerId: String) {
         super.init(nibName: nil, bundle: nil)
-        self.channleName = channelName
+        channleName = channelName
         self.ownerId = ownerId
-        self.id = channelName
+        id = channelName
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setupUI()
         setupAgoraKit()
         createAgoraVideoCanvas(uid: UserInfo.userId, isLocal: true)
         // 设置屏幕常亮
         UIApplication.shared.isIdleTimerDisabled = true
-        
+
         segmentView.titles = [channleName]
-        
+
         SyncUtil.scene(id: id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).get(success: { results in
             SyncUtil.scene(id: self.id)?.collection(className: SYNC_COLLECTION_SUB_ROOM).document().subscribe(key: "", onCreated: { result in
                 self.onCreated(result: result)
             }, onUpdated: { object in
                 self.onUpdated(object: object)
             }, onDeleted: { object in
-                
-            }, onSubscribed: {
-                
-            }, fail: { error in
+
+            }, onSubscribed: {}, fail: { error in
                 ToastView.show(text: error.message)
             })
             let subRooms = results.compactMap({ $0.toJson() }).compactMap({ JSONObject.toModel(BORSubRoomModel.self, value: $0) }).sorted { s1, s2 in
-                    return s1.createTime < s2.createTime
-                }
+                return s1.createTime < s2.createTime
+            }
             let titles = subRooms.compactMap({ $0.subRoom })
             guard !titles.isEmpty else { return }
             self.segmentView.titles = self.segmentView.titles + titles
@@ -117,14 +121,14 @@ class BORRoomDetailController: BaseViewController {
         }, onUpdated: { object in
             self.onUpdated(object: object)
         }, onDeleted: { object in
-            
+
         }, onSubscribed: {
             print("onSubscribed")
         }, fail: { error in
             ToastView.show(text: error.message)
         })
     }
-    
+
     private func onCreated(result: IObject) {
         var titles = segmentView.titles
         let roomModel = JSONObject.toModel(BORSubRoomModel.self, value: result.toJson())
@@ -133,16 +137,16 @@ class BORRoomDetailController: BaseViewController {
         segmentView.titles = titles
         print("onCreated == \(result)")
     }
-    
+
     private func onUpdated(object: IObject) {
         print("onUpdated == \(object)")
-        var titles = self.segmentView.titles
+        var titles = segmentView.titles
         let roomModel = JSONObject.toModel(BORSubRoomModel.self, value: object.toJson())
         guard !titles.contains(roomModel?.subRoom ?? "") else { return }
         titles.append(roomModel?.subRoom ?? "")
         segmentView.titles = titles
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         joinChannel(channelName: ownerId + channleName)
@@ -151,7 +155,7 @@ class BORRoomDetailController: BaseViewController {
         controllers.remove(at: index)
         navigationController?.viewControllers = controllers
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         agoraKit?.stopPreview()
@@ -160,27 +164,27 @@ class BORRoomDetailController: BaseViewController {
         SyncUtil.leaveScene(id: id)
         AgoraRtcEngineKit.destroy()
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         guard ownerId == UserInfo.uid else { return }
         SyncUtil.scene(id: id)?.delete(success: nil, fail: nil)
     }
-    
+
     private func setupUI() {
         view.backgroundColor = .white
         navigationItem.titleView = segmentView
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.circle")?.withTintColor(.red, renderingMode: .alwaysOriginal), style: .plain, target: self, action: #selector(onTapAddButton))
         videoView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(videoView)
-        
+
         videoView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         videoView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
         videoView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         videoView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        
+
         segmentView.titles = [channleName]
-        
+
         view.addSubview(voiceButton)
         voiceButton.translatesAutoresizingMaskIntoConstraints = false
         voiceButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15).isActive = true
@@ -188,7 +192,7 @@ class BORRoomDetailController: BaseViewController {
         voiceButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         voiceButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
-    
+
     private func setupAgoraKit() {
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
         agoraKit?.setLogFile(LogUtils.sdkLogPath())
@@ -203,9 +207,9 @@ class BORRoomDetailController: BaseViewController {
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
-    
+
     private func joinChannel(channelName: String) {
-        self.channleName = channelName
+        channleName = channelName
         let result = agoraKit?.joinChannel(byToken: KeyCenter.Token,
                                            channelId: channleName,
                                            uid: UserInfo.userId,
@@ -214,14 +218,15 @@ class BORRoomDetailController: BaseViewController {
         // Error code description can be found at:
         // en: https://docs.agora.io/en/Voice/API%20Reference/oc/Constants/AgoraErrorCode.html
         // cn: https://docs.agora.io/cn/Voice/API%20Reference/oc/Constants/AgoraErrorCode.html
-        self.showAlert(title: "Error".localized, message: "joinChannel call failed: \(String(describing: result)), please check your params")
+        showAlert(title: "Error".localized, message: "joinChannel call failed: \(String(describing: result)), please check your params")
     }
+
     private func leaveChannel() {
         agoraKit?.leaveChannel({ state in
             LogUtils.log(message: "left channel, duration: \(state.duration)", level: .info)
         })
     }
-        
+
     private func createAgoraVideoCanvas(uid: UInt, isLocal: Bool = false) {
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = uid
@@ -231,7 +236,7 @@ class BORRoomDetailController: BaseViewController {
         dataArray.append(model)
         videoView.dataArray = dataArray
     }
-    
+
     @objc
     private func onTapAddButton() {
         showTextFieldAlert(title: "Please_enter_a_subroom_name".localized, message: "") { [weak self] text in
@@ -246,24 +251,23 @@ class BORRoomDetailController: BaseViewController {
             let roomModel = BORSubRoomModel(subRoom: text)
             let roomParams = JSONObject.toJson(roomModel)
             SyncUtil.scene(id: self?.id ?? "")?.collection(className: SYNC_COLLECTION_SUB_ROOM).add(data: roomParams, success: { object in
-                
+
             }, fail: { error in
                 ToastView.show(text: error.message)
             })
         }
     }
-    
+
     @objc
     private func onTapVoiceButton(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         agoraKit?.muteLocalAudioStream(sender.isSelected)
     }
 }
+
 extension BORRoomDetailController: AGECollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-    }
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {}
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BORVideoRoomDetailCell.description(),
                                                       for: indexPath) as! BORVideoRoomDetailCell
@@ -287,21 +291,22 @@ extension BORRoomDetailController: AGECollectionViewDelegate {
         return cell
     }
 }
+
 extension BORRoomDetailController: AgoraRtcEngineDelegate {
-    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         LogUtils.log(message: "error: \(errorCode)", level: .error)
         showAlert(title: "Error", message: "Error \(errorCode.description) occur")
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         isJoined = true
         LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
         createAgoraVideoCanvas(uid: uid)
@@ -323,11 +328,11 @@ extension BORRoomDetailController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        localVideo.statsInfo?.updateLocalAudioStats(stats)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        remoteVideo.statsInfo?.updateVideoStats(stats)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        remoteVideo.statsInfo?.updateAudioStats(stats)
     }

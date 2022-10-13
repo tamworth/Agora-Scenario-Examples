@@ -23,16 +23,17 @@ class LiveRandomNameView: UIView {
     var text: String {
         textField.text ?? ""
     }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         backgroundColor = UIColor.black.withAlphaComponent(0.3)
         layer.cornerRadius = 8
@@ -45,7 +46,7 @@ class LiveRandomNameView: UIView {
         textField.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         textField.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
-    
+
     @objc
     private func onTapRandomNameButton() {
         textField.text = LiveRandomName.randomName()

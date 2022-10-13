@@ -13,11 +13,10 @@ extension Array {
         var result = [Element]()
         for value in self {
             let key = filter(value)
-            if !result.map({filter($0)}).contains(key) {
+            if !result.map({ filter($0) }).contains(key) {
                 result.append(value)
             }
         }
         return result
     }
 }
-

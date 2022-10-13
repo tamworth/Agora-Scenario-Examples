@@ -10,8 +10,7 @@ class GCDTimer {
     typealias ActionBlock = (String, TimeInterval) -> Void
     private var timerContainer = [String: DispatchSourceTimer]()
     private var currentDuration: TimeInterval = 0
-    
-    
+
     /// 秒级定时器
     ///
     /// - Parameters:
@@ -40,7 +39,7 @@ class GCDTimer {
             action(scheduledName, self.currentDuration)
         })
     }
-    
+
     /// 秒级倒计时定时器
     ///
     /// - Parameters:

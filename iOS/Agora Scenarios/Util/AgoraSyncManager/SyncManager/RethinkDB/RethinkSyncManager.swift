@@ -5,16 +5,17 @@
 //  Created by zhaoyongqiang on 2022/7/5.
 //
 
-import UIKit
 import SocketRocket
+import UIKit
 
 extension RethinkSyncManager {
     struct Config {
         let appId: String
         let channelName: String
-        
+
         init(appId: String,
-             channelName: String) {
+             channelName: String)
+        {
             self.appId = appId
             self.channelName = channelName
         }
@@ -41,29 +42,30 @@ public class RethinkSyncManager: NSObject {
     var onSuccessBlockObjOptional = [String: SuccessBlockObjOptional]()
     var onSuccessBlockObj = [String: SuccessBlockObj]()
     var onFailBlock = [String: FailBlock]()
-    var onCreateBlocks = [String : OnSubscribeBlock]()
-    var onUpdatedBlocks = [String : OnSubscribeBlock]()
-    var onDeletedBlocks = [String : OnSubscribeBlock]()
+    var onCreateBlocks = [String: OnSubscribeBlock]()
+    var onUpdatedBlocks = [String: OnSubscribeBlock]()
+    var onDeletedBlocks = [String: OnSubscribeBlock]()
     var appId: String = ""
     var channelName: String = ""
     var sceneName: String!
-    
+
     /// init
     /// - Parameters:
     ///   - config: config
     ///   - complete: white `code = 0` is success, else error
     init(config: Config,
-         complete: SuccessBlockInt?) {
+         complete: SuccessBlockInt?)
+    {
         super.init()
         connectBlock = complete
-        self.channelName = config.channelName
-        self.appId = config.appId
+        channelName = config.channelName
+        appId = config.appId
         reConnect(isRemove: true)
         NotificationCenter.default.addObserver(self, selector: #selector(enterForegroundNotification),
                                                name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
     }
-    
+
     public func reConnect(isRemove: Bool = false) {
         guard let url = URL(string: SOCKET_URL) else { return }
         disConnect(isRemove: isRemove)
@@ -86,6 +88,7 @@ public class RethinkSyncManager: NSObject {
             subscribe(channelName: $0)
         })
     }
+
     public func disConnect(isRemove: Bool) {
         timer?.invalidate()
         timer = nil
@@ -100,16 +103,18 @@ public class RethinkSyncManager: NSObject {
         onUpdatedBlocks.removeAll()
         onDeletedBlocks.removeAll()
     }
-    
+
     public func write(channelName: String, data: String?, objectId: String? = nil) {
         guard let data = data, let jsonData = data.data(using: .utf8) else { return }
         guard let dict = try? JSONSerialization.jsonObject(with: jsonData,
-                                                           options: .mutableContainers) else {
+                                                           options: .mutableContainers)
+        else {
             Log.errorText(text: "数据转成失败", tag: nil)
             return
         }
         writeData(channelName: channelName, params: dict, objectId: objectId, type: .send)
     }
+
     public func write(channelName: String, data: [String: Any?], objectId: String? = nil, isAdd: Bool = false) {
         writeData(channelName: channelName,
                   params: data,
@@ -117,17 +122,21 @@ public class RethinkSyncManager: NSObject {
                   type: .send,
                   isAdd: isAdd)
     }
+
     public func subscribe(channelName: String) {
         writeData(channelName: channelName, params: [:], type: .subscribe)
     }
+
     public func unsubscribe(channelName: String) {
         writeData(channelName: channelName, params: [:], type: .unsubscribe)
     }
+
     private func writeData(channelName: String,
                            params: Any,
                            objectId: String? = nil,
                            type: SocketType,
-                           isAdd: Bool = false) {
+                           isAdd: Bool = false)
+    {
         var newParams = params
         var propsId: String = objectId ?? UUID().uuid16string()
         if objectId == nil && params is [String: Any] {
@@ -139,12 +148,12 @@ public class RethinkSyncManager: NSObject {
             newParams = params ?? [:]
         }
 
-        let value = Utils.toJsonString(dict: newParams as? [String : Any])
+        let value = Utils.toJsonString(dict: newParams as? [String: Any])
         var p = ["appId": appId,
                  "channelName": channelName,
                  "action": type.rawValue,
                  "requestId": UUID().uuid16string(),
-                 "props": [propsId: value ?? ""]] as [String : Any]
+                 "props": [propsId: value ?? ""]] as [String: Any]
         if type == .subscribe || type == .unsubscribe || type == .query {
             p.removeValue(forKey: "props")
         }
@@ -166,9 +175,11 @@ public class RethinkSyncManager: NSObject {
             Log.errorText(text: error.localizedDescription, tag: "error")
         }
     }
+
     public func query(channelName: String) {
         writeData(channelName: channelName, params: [:], type: .query)
     }
+
     public func delete(channelName: String, data: Any) {
         var objectIds: [Any] = []
         if let params = data as? [[String: Any]] {
@@ -180,12 +191,12 @@ public class RethinkSyncManager: NSObject {
                  "channelName": channelName,
                  "action": SocketType.deleteProp.rawValue,
                  "requestId": UUID().uuid16string(),
-                 "props": objectIds] as [String : Any]
+                 "props": objectIds] as [String: Any]
         Log.debug(text: "delete params == \(p)", tag: "delete")
         let data = try? JSONSerialization.data(withJSONObject: p, options: [])
         try? socket?.send(dataNoCopy: data)
     }
-    
+
     @objc
     private func enterForegroundNotification() {
         guard socket?.readyState != .OPEN else { return }
@@ -199,6 +210,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
         connectBlock?(webSocket.readyState.rawValue == 1 ? 0 : webSocket.readyState.rawValue)
         connectBlock = nil
     }
+
     public func webSocket(_ webSocket: SRWebSocket, didReceiveMessage message: Any) {
         guard let data = message as? Data else { return }
         let dict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
@@ -213,14 +225,14 @@ extension RethinkSyncManager: SRWebSocketDelegate {
         let params = dict?["data"] as? [String: Any]
         let channelName = dict?["channelName"] as? String ?? ""
         let realAction = SocketType(rawValue: params?["action"] as? String ?? "") ?? .send
-        
+
         if let code = dict?["code"] as? String, code != "0", let msg = dict?["msg"] as? String {
             let error = SyncError(message: "\(channelName) \(msg)", code: Int(code) ?? 0)
             Log.errorText(text: "code == \(code)  action == \(realAction) channelName == \(channelName) msg == \(msg)", tag: "error")
-            self.onFailBlock[channelName]?(error)
+            onFailBlock[channelName]?(error)
             return
         }
-        
+
         let props = params?["props"] as? [String: Any]
         let propsDel = params?["propsDel"] as? [String]
         let propsUpdate = params?["propsUpdate"] as? String
@@ -236,7 +248,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
         if action == .subscribe {
             if let onUpdateBlock = onUpdatedBlocks[channelName], realAction == .send, let propsUpdate = propsUpdate {
                 let params = Utils.toDictionary(jsonString: propsUpdate)
-                let attrs = params.map({ Attribute(key: $0.key, value: ($0.value as? String) ?? "")})
+                let attrs = params.map({ Attribute(key: $0.key, value: ($0.value as? String) ?? "") })
                 attrs.forEach({
                     onUpdateBlock($0)
                 })
@@ -267,10 +279,12 @@ extension RethinkSyncManager: SRWebSocketDelegate {
         }
         Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "收到消息")
     }
+
     public func webSocket(_ webSocket: SRWebSocket, didFailWithError error: Error) {
         Log.errorText(text: error.localizedDescription, tag: "error")
         connectBlock?(-1)
     }
+
     public func webSocket(_ webSocket: SRWebSocket, didCloseWithCode code: Int, reason: String?, wasClean: Bool) {
         Log.warning(text: "socket closed == \(reason ?? "")", tag: "closed")
         reConnect()

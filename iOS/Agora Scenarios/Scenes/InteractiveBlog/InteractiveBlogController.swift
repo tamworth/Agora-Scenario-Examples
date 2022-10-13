@@ -5,16 +5,16 @@
 //  Created by zhaoyongqiang on 2021/11/11.
 //
 
-import UIKit
 import AgoraRtcKit
+import UIKit
 
 var interactiveBlogDownPullClosure: ((_ channelName: String, _ model: InteractiveBlogUsersModel?, _ agoraKit: AgoraRtcEngineKit?, _ role: AgoraClientRole) -> Void)?
 class InteractiveBlogController: BaseViewController {
-    
     public lazy var liveView: InteractiveBlogView = {
         let view = InteractiveBlogView(channelName: channleName, role: getRole(uid: UserInfo.uid), isAddUser: isAddUser)
         return view
     }()
+
     public var agoraKit: AgoraRtcEngineKit?
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
         let config = AgoraRtcEngineConfig()
@@ -23,33 +23,36 @@ class InteractiveBlogController: BaseViewController {
         config.areaCode = .global
         return config
     }()
+
     public lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
         let option = AgoraRtcChannelMediaOptions()
         option.autoSubscribeAudio = .of(true)
         option.autoSubscribeVideo = .of(false)
         return option
     }()
+
     private(set) var channleName: String = ""
     private(set) var currentUserId: String = ""
     private var isAddUser: Bool = true
-    
+
     /// 用户角色
     public func getRole(uid: String) -> AgoraClientRole {
         uid == currentUserId ? .broadcaster : .audience
     }
-    
+
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil, isAddUser: Bool = true) {
         super.init(nibName: nil, bundle: nil)
         self.isAddUser = isAddUser
-        self.channleName = channelName
+        channleName = channelName
         self.agoraKit = agoraKit
-        self.currentUserId = userId
+        currentUserId = userId
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -58,12 +61,12 @@ class InteractiveBlogController: BaseViewController {
         // 设置屏幕常亮
         UIApplication.shared.isIdleTimerDisabled = true
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationTransparent(isTransparent: true, isHiddenNavBar: true)
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         joinChannel(channelName: channleName, uid: UserInfo.userId)
@@ -73,28 +76,28 @@ class InteractiveBlogController: BaseViewController {
         controllers.remove(at: index)
         navigationController?.viewControllers = controllers
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
-    
+
     private func setupUI() {
         view.layer.contents = nil
         view.backgroundColor = .init(hex: "#10141c")
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIView())
         liveView.translatesAutoresizingMaskIntoConstraints = false
-    
+
         view.addSubview(liveView)
-        
+
         liveView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         liveView.topAnchor.constraint(equalTo: view.topAnchor, constant: Screen.kNavHeight).isActive = true
         liveView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         liveView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
-    
+
     public func eventHandler() {
         liveView.onTapLeaveButtonClosure = { [weak self] in
             guard let self = self else { return }
@@ -115,23 +118,21 @@ class InteractiveBlogController: BaseViewController {
             self.agoraKit?.updateChannel(with: self.channelMediaOptions)
             self.agoraKit?.setClientRole(isEnable ? .broadcaster : .audience)
         }
-        
+
         guard getRole(uid: UserInfo.uid) == .audience else { return }
         SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
+
         }, onUpdated: { object in
-            
+
         }, onDeleted: { object in
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
-            
-        }, fail: { error in
-            
+        }, onSubscribed: {}, fail: { error in
+
         })
     }
-    
+
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
@@ -147,7 +148,7 @@ class InteractiveBlogController: BaseViewController {
             navigationController?.popViewController(animated: true)
         }
     }
-        
+
     private func setupAgoraKit() {
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
         agoraKit?.setLogFile(LogUtils.sdkLogPath())
@@ -158,17 +159,17 @@ class InteractiveBlogController: BaseViewController {
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
-    
+
     private func joinChannel(channelName: String, uid: UInt) {
         guard isAddUser else { return }
-        channelMediaOptions.clientRoleType = .of((Int32)(getRole(uid: "\(uid)").rawValue))
+        channelMediaOptions.clientRoleType = .of(Int32(getRole(uid: "\(uid)").rawValue))
         channelMediaOptions.publishMicrophoneTrack = .of(getRole(uid: "\(uid)") == .broadcaster)
         let result = agoraKit?.joinChannel(byToken: KeyCenter.Token, channelId: channelName, info: nil, uid: uid, joinSuccess: nil)
         if result == 0 {
             LogUtils.log(message: "进入房间", level: .info)
         }
     }
-    
+
     public func leaveChannel() {
         agoraKit?.disableAudio()
         agoraKit?.disableVideo()
@@ -180,26 +181,26 @@ class InteractiveBlogController: BaseViewController {
         })
         AgoraRtcEngineKit.destroy()
     }
-    
+
     deinit {
         LogUtils.log(message: "释放 === \(self)", level: .info)
     }
 }
 
 extension InteractiveBlogController: AgoraRtcEngineDelegate {
-    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         LogUtils.log(message: "error: \(errorCode)", level: .error)
         showAlert(title: "Error", message: "Error \(errorCode.description) occur")
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
     }
@@ -215,12 +216,12 @@ extension InteractiveBlogController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        localVideo.statsInfo?.updateLocalAudioStats(stats)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        remoteVideo.statsInfo?.updateVideoStats(stats)
         LogUtils.log(message: "remoteVideoWidth== \(stats.width) Height == \(stats.height)", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        remoteVideo.statsInfo?.updateAudioStats(stats)
     }

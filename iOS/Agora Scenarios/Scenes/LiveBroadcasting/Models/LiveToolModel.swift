@@ -8,11 +8,9 @@
 import UIKit
 
 class LiveToolModel {
-
     var imageName: String = ""
     var selectedImageName: String = ""
     var title: String = ""
     var type: LiveToolType = .switch_camera
     var isSelected: Bool = false
-    
 }

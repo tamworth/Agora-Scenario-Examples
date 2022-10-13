@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/10/29.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class BORHomeViewController: BaseViewController {
     private lazy var tableView: AGETableView = {
@@ -19,13 +19,14 @@ class BORHomeViewController: BaseViewController {
                       forCellWithReuseIdentifier: LiveRoomListCell.description())
         return view
     }()
+
     private lazy var addRoomButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "create_room"), for: .normal)
         button.addTarget(self, action: #selector(onTapAddRoomButton), for: .touchUpInside)
         return button
     }()
-    
+
     private var dataArray = [BORLiveModel]()
 
     override func viewDidLoad() {
@@ -33,18 +34,18 @@ class BORHomeViewController: BaseViewController {
         setupUI()
         ToastView.showWait(text: "loading".localized, view: view)
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         getData()
     }
-    
+
     private func getData() {
         SyncUtil.fetchAll { objects in
             ToastView.hidden()
             self.tableView.endRefreshing()
-            print("result == \(objects.compactMap{ $0.toJson() })")
-            self.dataArray = objects.compactMap({ $0.toJson() }).compactMap({ JSONObject.toModel(BORLiveModel.self, value: $0 )})
+            print("result == \(objects.compactMap { $0.toJson() })")
+            self.dataArray = objects.compactMap({ $0.toJson() }).compactMap({ JSONObject.toModel(BORLiveModel.self, value: $0) })
             self.tableView.dataArray = self.dataArray
         } fail: { error in
             LogUtils.log(message: "get all data error == \(error.localizedDescription)", level: .error)
@@ -52,7 +53,7 @@ class BORHomeViewController: BaseViewController {
             self.tableView.endRefreshing()
         }
     }
-    
+
     private func setupUI() {
         view.addSubview(tableView)
         view.addSubview(addRoomButton)
@@ -61,11 +62,12 @@ class BORHomeViewController: BaseViewController {
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        
+
         addRoomButton.translatesAutoresizingMaskIntoConstraints = false
         addRoomButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -25).isActive = true
         addRoomButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -35).isActive = true
     }
+
     @objc
     private func onTapAddRoomButton() {
         let createRoomVC = BORCreateRoomController()
@@ -88,11 +90,13 @@ extension BORHomeViewController: AGETableViewDelegate {
             LogUtils.log(message: "join scene error == \(error.localizedDescription)", level: .error)
         }
     }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: LiveRoomListCell.description(), for: indexPath) as! LiveRoomListCell
         cell.setRoomInfo(info: dataArray[indexPath.item])
         return cell
     }
+
     func pullToRefreshHandler() {
         getData()
     }

@@ -10,18 +10,17 @@ import Foundation
 struct CDNPKInfo: Codable {
     /// 当前房间正在pk的用户id
     let userIdPK: String
-    
-    var dict: [String : String] {
-        return ["userIdPK" : userIdPK]
+
+    var dict: [String: String] {
+        return ["userIdPK": userIdPK]
     }
-    
+
     init(userIdPK: String) {
         self.userIdPK = userIdPK
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.userIdPK = try container.decode(String.self, forKey: .userIdPK)
+        userIdPK = try container.decode(String.self, forKey: .userIdPK)
     }
 }
-

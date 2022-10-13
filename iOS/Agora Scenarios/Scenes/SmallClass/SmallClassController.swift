@@ -5,10 +5,10 @@
 //  Created by zhaoyongqiang on 2021/11/11.
 //
 
-import UIKit
+import Agora_Scene_Utils
 import AgoraRtcKit
 import Fastboard
-import Agora_Scene_Utils
+import UIKit
 
 class SmallClassController: BaseViewController {
     private lazy var fastRoom: FastRoom = {
@@ -22,6 +22,7 @@ class SmallClassController: BaseViewController {
         fastRoom.view.layer.masksToBounds = true
         return fastRoom
     }()
+
     public lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         view.itemSize = CGSize(width: 78, height: 78)
@@ -33,6 +34,7 @@ class SmallClassController: BaseViewController {
                       forCellWithReuseIdentifier: AgoraUserCollectionViewCell.description())
         return view
     }()
+
     private lazy var videoButton: AGEButton = {
         let button = AGEButton()
         button.setImage(UIImage(named: "SmallClass/video_default"), for: .normal)
@@ -41,6 +43,7 @@ class SmallClassController: BaseViewController {
         button.isSelected = true
         return button
     }()
+
     private lazy var audioButton: AGEButton = {
         let button = AGEButton()
         button.setImage(UIImage(named: "SmallClass/audio_default"), for: .normal)
@@ -49,6 +52,7 @@ class SmallClassController: BaseViewController {
         button.isSelected = true
         return button
     }()
+
     private lazy var closeButton: AGEButton = {
         let button = AGEButton()
         button.layer.cornerRadius = 19
@@ -58,10 +62,10 @@ class SmallClassController: BaseViewController {
         button.addTarget(self, action: #selector(onTapCloseLive), for: .touchUpInside)
         return button
     }()
-    
+
     /// 顶部头像昵称
     public lazy var avatarview = LiveAvatarView()
-    
+
     public var agoraKit: AgoraRtcEngineKit?
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
         let config = AgoraRtcEngineConfig()
@@ -70,15 +74,17 @@ class SmallClassController: BaseViewController {
         config.areaCode = .global
         return config
     }()
+
     public lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
         let option = AgoraRtcChannelMediaOptions()
-        option.clientRoleType = .of((Int32)(AgoraClientRole.broadcaster.rawValue))
+        option.clientRoleType = .of(Int32(AgoraClientRole.broadcaster.rawValue))
         option.publishMicrophoneTrack = .of(true)
         option.publishCameraTrack = .of(true)
         option.autoSubscribeAudio = .of(true)
         option.autoSubscribeVideo = .of(true)
         return option
     }()
+
     private(set) var channleName: String = ""
     private(set) var currentUserId: String = ""
     private var collectionViewCons: NSLayoutConstraint?
@@ -91,23 +97,25 @@ class SmallClassController: BaseViewController {
             collectionViewCons?.isActive = true
         }
     }
+
     /// 用户角色
     public func getRole(uid: String) -> AgoraClientRole {
         uid == currentUserId ? .broadcaster : .audience
     }
-    
+
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
-        self.channleName = channelName
+        channleName = channelName
         self.agoraKit = agoraKit
-        self.currentUserId = userId
+        currentUserId = userId
         avatarview.setName(with: channelName)
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -116,14 +124,14 @@ class SmallClassController: BaseViewController {
         // 设置屏幕常亮
         UIApplication.shared.isIdleTimerDisabled = true
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationTransparent(isTransparent: true, isHiddenNavBar: true)
         let appdelegate = UIApplication.shared.delegate as? AppDelegate
         appdelegate?.blockRotation = .landscapeRight
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         joinChannel(channelName: channleName, uid: UserInfo.userId)
@@ -133,7 +141,7 @@ class SmallClassController: BaseViewController {
         controllers.remove(at: index)
         navigationController?.viewControllers = controllers
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel()
@@ -151,7 +159,7 @@ class SmallClassController: BaseViewController {
         agoraKit?.disableVideo()
         AgoraRtcEngineKit.destroy()
     }
-    
+
     private func setupUI() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIView())
         fastRoom.view.translatesAutoresizingMaskIntoConstraints = false
@@ -160,50 +168,50 @@ class SmallClassController: BaseViewController {
         videoButton.translatesAutoresizingMaskIntoConstraints = false
         audioButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.translatesAutoresizingMaskIntoConstraints = false
-        
+
         view.addSubview(fastRoom.view)
         view.addSubview(collectionView)
         view.addSubview(avatarview)
         view.addSubview(videoButton)
         view.addSubview(audioButton)
         view.addSubview(closeButton)
-        
+
         collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
         collectionView.heightAnchor.constraint(equalToConstant: 78).isActive = true
         collectionViewCons = collectionView.widthAnchor.constraint(equalToConstant: 78)
         collectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
+
         fastRoom.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
         fastRoom.view.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 10).isActive = true
         fastRoom.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
         fastRoom.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15).isActive = true
-        
+
         avatarview.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5).isActive = true
         avatarview.topAnchor.constraint(equalTo: view.topAnchor, constant: 5).isActive = true
-        
+
         audioButton.leadingAnchor.constraint(equalTo: fastRoom.view.leadingAnchor, constant: 15).isActive = true
         audioButton.bottomAnchor.constraint(equalTo: fastRoom.view.bottomAnchor, constant: -25).isActive = true
-        
+
         videoButton.leadingAnchor.constraint(equalTo: audioButton.leadingAnchor).isActive = true
         videoButton.bottomAnchor.constraint(equalTo: audioButton.topAnchor, constant: -15).isActive = true
-        
+
         closeButton.trailingAnchor.constraint(equalTo: fastRoom.view.trailingAnchor, constant: -15).isActive = true
         closeButton.bottomAnchor.constraint(equalTo: audioButton.bottomAnchor).isActive = true
         closeButton.widthAnchor.constraint(equalToConstant: 38).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 38).isActive = true
     }
-    
-   private func getUserStatus() {
+
+    private func getUserStatus() {
         SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { results in
             let datas = results.compactMap({ $0.toJson() })
-                .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0 )})
+                .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0) })
                 .sorted(by: { $0.timestamp < $1.timestamp })
             self.dataArray = datas
         }, fail: { error in
             ToastView.show(text: error.message)
         })
     }
-    
+
     public func eventHandler() {
         SyncUtil.scene(id: channleName)?.subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION, onCreated: nil, onUpdated: { object in
             guard let userInfo = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson()) else { return }
@@ -219,23 +227,21 @@ class SmallClassController: BaseViewController {
         }, onSubscribed: nil, fail: { error in
             LogUtils.log(message: error.description, level: .error)
         })
-        
+
         guard getRole(uid: UserInfo.uid) == .audience else { return }
         SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
+
         }, onUpdated: { object in
-            
+
         }, onDeleted: { object in
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
-            
-        }, fail: { error in
-            
+        }, onSubscribed: {}, fail: { error in
+
         })
     }
-    
+
     @objc
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
@@ -248,7 +254,7 @@ class SmallClassController: BaseViewController {
             navigationController?.popViewController(animated: true)
         }
     }
-        
+
     private func setupAgoraKit() {
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
         agoraKit?.setLogFile(LogUtils.sdkLogPath())
@@ -260,7 +266,7 @@ class SmallClassController: BaseViewController {
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
-    
+
     private func joinChannel(channelName: String, uid: UInt) {
         let result = agoraKit?.joinChannel(byToken: KeyCenter.Token,
                                            channelId: channelName,
@@ -276,7 +282,7 @@ class SmallClassController: BaseViewController {
         dataArray.append(model)
         agoraKit?.startPreview()
         fastRoom.joinRoom()
-                
+
         let params = JSONObject.toJson(model)
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: params, success: { object in
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -286,7 +292,7 @@ class SmallClassController: BaseViewController {
             ToastView.show(text: error.message)
         })
     }
-    
+
     private func leaveChannel() {
         guard let model = dataArray.first(where: { $0.userId == UserInfo.uid }) else { return }
         SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
@@ -300,7 +306,7 @@ class SmallClassController: BaseViewController {
             LogUtils.log(message: "leave channel: \(state)", level: .info)
         })
     }
-    
+
     @objc
     private func onTapVideoButton(sender: AGEButton) {
         guard let index = dataArray.firstIndex(where: { $0.userId == UserInfo.uid }) else { return }
@@ -308,15 +314,16 @@ class SmallClassController: BaseViewController {
         var model = dataArray[index]
         model.isEnableVideo = sender.isSelected
         dataArray[index] = model
-        
+
         SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .document(id: model.objectId ?? "")
             .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
-        
+
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = .of(sender.isSelected)
         agoraKit?.updateChannel(with: option)
     }
+
     @objc
     private func onTapAudioButton(sender: AGEButton) {
         guard let index = dataArray.firstIndex(where: { $0.userId == UserInfo.uid }) else { return }
@@ -324,35 +331,35 @@ class SmallClassController: BaseViewController {
         var model = dataArray[index]
         model.isEnableAudio = sender.isSelected
         dataArray[index] = model
-        
+
         SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .document(id: model.objectId ?? "")
             .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
-        
+
         let option = AgoraRtcChannelMediaOptions()
         option.publishMicrophoneTrack = .of(sender.isSelected)
         agoraKit?.updateChannel(with: option)
     }
-    
+
     deinit {
         LogUtils.log(message: "释放 === \(self)", level: .info)
     }
 }
 
 extension SmallClassController: AgoraRtcEngineDelegate {
-    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         LogUtils.log(message: "error: \(errorCode)", level: .error)
         showAlert(title: "Error", message: "Error \(errorCode.description) occur")
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
 //        var model = AgoraUsersModel()
@@ -376,12 +383,12 @@ extension SmallClassController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        localVideo.statsInfo?.updateLocalAudioStats(stats)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        remoteVideo.statsInfo?.updateVideoStats(stats)
         LogUtils.log(message: "remoteVideoWidth== \(stats.width) Height == \(stats.height)", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        remoteVideo.statsInfo?.updateAudioStats(stats)
     }
@@ -406,7 +413,6 @@ extension SmallClassController: AGECollectionViewDelegate {
         cell.setupData(model: model)
         return cell
     }
-
 }
 
 class AgoraUserCollectionViewCell: UICollectionViewCell {
@@ -418,38 +424,43 @@ class AgoraUserCollectionViewCell: UICollectionViewCell {
         imageView.isUserInteractionEnabled = false
         return imageView
     }()
+
     lazy var canvasView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 10.fit
         view.layer.masksToBounds = true
         return view
     }()
+
     private lazy var nameLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .middle)
         return label
     }()
+
     private lazy var muteAudioImageView: AGEImageView = {
         let imageView = AGEImageView(systemName: "mic.slash", imageColor: .red)
         imageView.isHidden = true
         return imageView
     }()
+
     private lazy var muteVideoImageView: AGEImageView = {
         let imageView = AGEImageView(systemName: "video.slash", imageColor: .red)
         imageView.isHidden = true
         return imageView
     }()
-    
+
     var defaultImageName: String?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupData(model: AgoraUsersModel) {
         avatariImageView.setImage(UIImage(named: model.avatar), for: .normal)
         muteVideoImageView.isHidden = model.isEnableVideo ?? false
@@ -457,7 +468,7 @@ class AgoraUserCollectionViewCell: UICollectionViewCell {
         canvasView.isHidden = model.isEnableVideo == false
         nameLabel.text = model.userName
     }
-    
+
     func setupData(model: ClassUsersModel) {
         avatariImageView.setImage(UIImage(named: model.avatar), for: .normal)
         muteVideoImageView.isHidden = model.isEnableVideo ?? false
@@ -465,7 +476,7 @@ class AgoraUserCollectionViewCell: UICollectionViewCell {
         canvasView.isHidden = model.isEnableVideo == false
         nameLabel.text = model.userName
     }
-    
+
     private func setupUI() {
         avatariImageView.translatesAutoresizingMaskIntoConstraints = false
         canvasView.translatesAutoresizingMaskIntoConstraints = false
@@ -481,15 +492,15 @@ class AgoraUserCollectionViewCell: UICollectionViewCell {
         avatariImageView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         avatariImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         avatariImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        
+
         canvasView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         canvasView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         canvasView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         canvasView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        
+
         nameLabel.leadingAnchor.constraint(equalTo: canvasView.leadingAnchor, constant: 5).isActive = true
         nameLabel.bottomAnchor.constraint(equalTo: canvasView.bottomAnchor, constant: -5).isActive = true
-        
+
         muteVideoImageView.rightAnchor.constraint(equalTo: avatariImageView.rightAnchor, constant: -5).isActive = true
         muteVideoImageView.topAnchor.constraint(equalTo: avatariImageView.topAnchor, constant: 5).isActive = true
         muteVideoImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true

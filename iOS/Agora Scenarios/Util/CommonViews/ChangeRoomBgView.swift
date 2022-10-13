@@ -5,23 +5,23 @@
 //  Created by zhaoyongqiang on 2022/1/26.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 struct ChangeRoomBGModel {
     var imageName: String = ""
 }
 
 class ChangeRoomBgView: UIView {
-    
     var didSelectedBgImageClosure: ((String) -> Void)?
-    
+
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .middle)
         label.text = "background".localized
         label.colorStyle = .white
         return label
     }()
+
     public lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         let w = (Screen.width - 40) / 3
@@ -35,16 +35,18 @@ class ChangeRoomBgView: UIView {
                       forCellWithReuseIdentifier: ChangeRoomBGCell.description())
         return view
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         createData()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func createData() {
         var dataArray = [ChangeRoomBGModel]()
         for i in 1...9 {
@@ -53,7 +55,7 @@ class ChangeRoomBgView: UIView {
         }
         collectionView.dataArray = dataArray
     }
-    
+
     private func setupUI() {
         backgroundColor = .init(hex: "#4F506A")
         layer.cornerRadius = 10
@@ -64,7 +66,7 @@ class ChangeRoomBgView: UIView {
         heightAnchor.constraint(equalToConstant: Screen.width + 50).isActive = true
         addSubview(titleLabel)
         addSubview(collectionView)
-        
+
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
@@ -83,12 +85,12 @@ extension ChangeRoomBgView: AGECollectionViewDelegate {
         cell.setImageName(model?.imageName ?? "")
         return cell
     }
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let model = self.collectionView.dataArray?[indexPath.item] as? ChangeRoomBGModel
         didSelectedBgImageClosure?(model?.imageName ?? "")
     }
 }
-
 
 class ChangeRoomBGCell: UICollectionViewCell {
     private lazy var imageView: AGEImageView = {
@@ -99,19 +101,21 @@ class ChangeRoomBGCell: UICollectionViewCell {
         imageView.layer.borderWidth = 0
         return imageView
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setImageName(_ name: String) {
         imageView.image = UIImage(named: name)
     }
-    
+
     private func setupUI() {
         contentView.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -120,7 +124,7 @@ class ChangeRoomBGCell: UICollectionViewCell {
         imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
     }
-    
+
     override var isSelected: Bool {
         didSet {
             imageView.layer.borderWidth = isSelected ? 1 : 0

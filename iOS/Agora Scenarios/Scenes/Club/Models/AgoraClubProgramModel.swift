@@ -10,7 +10,7 @@ import UIKit
 enum AgoraClubProgramType: String {
     case miracle
     case playing
-    
+
     var videoUrl: String {
         switch self {
         case .miracle: return "https://webdemo-pull-hdl.agora.io/lbhd/sample1.flv"
@@ -20,10 +20,8 @@ enum AgoraClubProgramType: String {
 }
 
 class AgoraClubProgramModel: NSObject {
-    
     var type: AgoraClubProgramType = .miracle
-    
-    
+
     static func createData() -> [AgoraClubProgramModel] {
         var tempArray = [AgoraClubProgramModel]()
         var model = AgoraClubProgramModel()

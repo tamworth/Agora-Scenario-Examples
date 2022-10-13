@@ -19,17 +19,18 @@ class CDNInvitationView: UIView {
     private var infos = [CDNInvitationViewCell.Info]()
     weak var delegate: CDNInvitationViewDelegate?
     var manager: CDNInvitationSheetManager?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
         commomInit()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setup() {
         backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
@@ -41,28 +42,28 @@ class CDNInvitationView: UIView {
         addSubview(titleLabel)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
+
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        
+
         tableView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
         tableView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
-    
+
     private func commomInit() {
         tableView.register(CDNInvitationViewCell.self,
                            forCellReuseIdentifier: "InvitationCell")
         tableView.delegate = self
         tableView.dataSource = self
     }
-    
+
     private func update(infos: [CDNInvitationViewCell.Info]) {
         self.infos = infos
         tableView.reloadData()
     }
-    
+
     func startFetch(manager: CDNInvitationSheetManager) {
         self.manager = manager
         manager.delegate = self
@@ -74,7 +75,7 @@ extension CDNInvitationView: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return infos.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "InvitationCell", for: indexPath) as! CDNInvitationViewCell
         cell.selectionStyle = .none
@@ -83,7 +84,7 @@ extension CDNInvitationView: UITableViewDataSource, UITableViewDelegate {
         cell.udpate(info: info)
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
     }

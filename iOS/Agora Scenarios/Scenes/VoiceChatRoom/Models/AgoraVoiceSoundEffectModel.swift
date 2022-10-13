@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2022/1/27.
 //
 
-import UIKit
 import AgoraRtcKit
+import UIKit
 
 enum SoundEffectType: Int, CaseIterable {
     case space = 0
@@ -35,7 +35,7 @@ enum SoundEffectType: Int, CaseIterable {
             tempArray.append(model)
             model = AgoraVoiceSoundEffectModel(imageName: "icon-3D人声", title: "three_d_human".localized, effectPreset: .roomAcous3DVoice)
             tempArray.append(model)
-            
+
         case .voiceChangerEffect:
             var model = AgoraVoiceSoundEffectModel(imageName: "icon-大叔磁性", title: "uncle".localized, effectPreset: .voiceChangerEffectUncle)
             tempArray.append(model)
@@ -51,7 +51,7 @@ enum SoundEffectType: Int, CaseIterable {
             tempArray.append(model)
             model = AgoraVoiceSoundEffectModel(imageName: "icon-绿巨人", title: "hulk".localized, effectPreset: .voiceChangerEffectHulk)
             tempArray.append(model)
-            
+
         case .styleTransformation:
             var model = AgoraVoiceSoundEffectModel(imageName: "icon-R&B", title: "R&B", effectPreset: .styleTransformationRnb)
             tempArray.append(model)
@@ -83,22 +83,22 @@ enum SoundEffectType: Int, CaseIterable {
             tempArray.append(model)
             model = AgoraVoiceSoundEffectModel(title: "Gb", effectPreset: .pitchCorrection, pitchCorrectionValue: 12)
             tempArray.append(model)
-            
+
         case .magicTone: break
         }
         return tempArray
     }
-    
+
     var title: String {
         switch self {
-        case .space:               return "space_shape".localized
-        case .voiceChangerEffect:  return "voice_sound".localized
+        case .space: return "space_shape".localized
+        case .voiceChangerEffect: return "voice_sound".localized
         case .styleTransformation: return "style_sound".localized
-        case .pitchCorrection:     return "electronic_music_sound".localized
-        case .magicTone:           return "magic_scale".localized
+        case .pitchCorrection: return "electronic_music_sound".localized
+        case .magicTone: return "magic_scale".localized
         }
     }
-    
+
     var edges: UIEdgeInsets {
         switch self {
         case .voiceChangerEffect: fallthrough
@@ -108,7 +108,7 @@ enum SoundEffectType: Int, CaseIterable {
         case .magicTone: return .zero
         }
     }
-    
+
     var minInteritemSpacing: CGFloat {
         switch self {
         case .voiceChangerEffect: fallthrough
@@ -118,7 +118,7 @@ enum SoundEffectType: Int, CaseIterable {
         case .magicTone: return 0
         }
     }
-    
+
     var minLineSpacing: CGFloat {
         switch self {
         case .voiceChangerEffect: fallthrough
@@ -128,24 +128,23 @@ enum SoundEffectType: Int, CaseIterable {
         case .magicTone: return 0
         }
     }
-    
+
     var layout: CGSize {
         switch self {
         case .voiceChangerEffect: fallthrough
         case .styleTransformation: fallthrough
         case .space:
-            let w = (Screen.width - 30.fit * 2 -  20.fit * 3) / 4
+            let w = (Screen.width - 30.fit * 2 - 20.fit * 3) / 4
             return CGSize(width: w, height: 100)
-            
+
         case .pitchCorrection:
             let w = (Screen.width - 30.fit * 2 - 20.fit * 3) / 4
             return CGSize(width: w, height: 40)
-            
+
         case .magicTone: return .zero
         }
     }
 }
-
 
 struct AgoraVoiceSoundEffectModel {
     var imageName: String = ""

@@ -10,7 +10,7 @@ import UIKit
 class LiveBottomView: UIView {
     var onTapBottomButtonTypeClosure: ((LiveBottomType) -> Void)?
     var onTapChatButtonClosure: ((String) -> Void)?
-    
+
     enum LiveBottomType: Int {
         case tool = 1
         case close = 2
@@ -39,14 +39,14 @@ class LiveBottomView: UIView {
             case .shopping: return "Shopping/icon-货架"
             }
         }
-        
+
         var title: String {
             switch self {
             case .exitgame: return "quit_the_game".localized
             default: return ""
             }
         }
-        
+
         var size: CGSize {
             switch self {
             case .exitgame: return CGSize(width: 80.fit, height: 38)
@@ -55,7 +55,7 @@ class LiveBottomView: UIView {
             }
         }
     }
-    
+
     private lazy var statckView: UIStackView = {
         let stackView = UIStackView()
         stackView.alignment = .fill
@@ -66,6 +66,7 @@ class LiveBottomView: UIView {
         stackView.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return stackView
     }()
+
     private lazy var chatButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = UIColor(hex: "#000000", alpha: 0.6)
@@ -88,24 +89,26 @@ class LiveBottomView: UIView {
         }
         return button
     }()
+
     private var type: [LiveBottomType] = []
-    
+
     init(type: [LiveBottomType]) {
         super.init(frame: .zero)
         self.type = type
         setupUI()
         createBottomButton()
     }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func updateButtonType(type: [LiveBottomType]) {
         self.type = type
         statckView.subviews.forEach({
@@ -113,15 +116,15 @@ class LiveBottomView: UIView {
         })
         createBottomButton()
     }
-    
+
     func hiddenOrShowChatView(isHidden: Bool) {
         chatButton.isHidden = isHidden
     }
-    
+
     private func setupUI() {
         chatButton.translatesAutoresizingMaskIntoConstraints = false
         statckView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         addSubview(chatButton)
         addSubview(statckView)
         chatButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15).isActive = true
@@ -129,13 +132,13 @@ class LiveBottomView: UIView {
         chatButton.heightAnchor.constraint(equalToConstant: 38).isActive = true
         chatButton.topAnchor.constraint(equalTo: topAnchor).isActive = true
 //        chatButton.widthAnchor.constraint(equalToConstant: 100.fit).isActive = true
-        
+
         statckView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true
         statckView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         statckView.heightAnchor.constraint(equalToConstant: 38).isActive = true
         statckView.leadingAnchor.constraint(equalTo: chatButton.trailingAnchor, constant: 15).isActive = true
     }
-    
+
     private func createBottomButton() {
         guard !type.isEmpty else { return }
         type.forEach({
@@ -155,7 +158,7 @@ class LiveBottomView: UIView {
             button.heightAnchor.constraint(equalToConstant: $0.size.height).isActive = true
         })
     }
-    
+
     @objc
     private func onTapChatButton() {
 //        ToastView.show(text: "没实现")
@@ -165,7 +168,7 @@ class LiveBottomView: UIView {
         }
         AlertManager.show(view: chatMessageView, alertPostion: .bottom)
     }
-    
+
     @objc
     private func onTapButtonHandler(sender: UIButton) {
         guard let buttonType = LiveBottomType(rawValue: sender.tag) else { return }

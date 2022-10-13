@@ -9,7 +9,7 @@ import UIKit
 
 struct AgoraUsersModel: Codable {
     var userName: String = "User-\(UserInfo.uid)"
-    var avatar: String = String(format: "portrait%02d", Int.random(in: 1...14))
+    var avatar: String = .init(format: "portrait%02d", Int.random(in: 1...14))
     var userId: String = UserInfo.uid
     var status: PKApplyInfoStatus? = .end
     var timestamp: String = "".timeStamp16

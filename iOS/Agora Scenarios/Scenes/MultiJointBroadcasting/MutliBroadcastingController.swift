@@ -5,9 +5,9 @@
 //  Created by zhaoyongqiang on 2021/11/11.
 //
 
-import UIKit
-import AgoraRtcKit
 import Agora_Scene_Utils
+import AgoraRtcKit
+import UIKit
 
 class MutliBroadcastingController: BaseViewController {
     private lazy var liveView: LiveBaseView = {
@@ -15,10 +15,12 @@ class MutliBroadcastingController: BaseViewController {
         view.updateLiveLayout(postion: .mutli)
         return view
     }()
+
     private lazy var mutliView: MutliView = {
         let view = MutliView(channelName: channleName, role: getRole(uid: UserInfo.uid), agoraKit: agoraKit)
         return view
     }()
+
     private var agoraKit: AgoraRtcEngineKit?
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
         let config = AgoraRtcEngineConfig()
@@ -27,31 +29,34 @@ class MutliBroadcastingController: BaseViewController {
         config.areaCode = .global
         return config
     }()
+
     private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
         let option = AgoraRtcChannelMediaOptions()
         option.autoSubscribeAudio = .of(true)
         option.autoSubscribeVideo = .of(true)
         return option
     }()
+
     private(set) var channleName: String = ""
     private(set) var currentUserId: String = ""
-    
+
     /// 用户角色
     public func getRole(uid: String) -> AgoraClientRole {
         uid == currentUserId ? .broadcaster : .audience
     }
-    
+
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
-        self.channleName = channelName
+        channleName = channelName
         self.agoraKit = agoraKit
-        self.currentUserId = userId
+        currentUserId = userId
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupAgoraKit()
@@ -60,12 +65,12 @@ class MutliBroadcastingController: BaseViewController {
         // 设置屏幕常亮
         UIApplication.shared.isIdleTimerDisabled = true
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationTransparent(isTransparent: true, isHiddenNavBar: true)
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         joinChannel(channelName: channleName, uid: UserInfo.userId)
@@ -75,7 +80,7 @@ class MutliBroadcastingController: BaseViewController {
         controllers.remove(at: index)
         navigationController?.viewControllers = controllers
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         mutliView.leavl()
@@ -90,27 +95,27 @@ class MutliBroadcastingController: BaseViewController {
         agoraKit?.disableVideo()
         AgoraRtcEngineKit.destroy()
     }
-    
+
     private func setupUI() {
         view.backgroundColor = .init(hex: "#404B54")
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIView())
         liveView.translatesAutoresizingMaskIntoConstraints = false
-    
+
         view.addSubview(mutliView)
         view.addSubview(liveView)
-        
+
         liveView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         liveView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         liveView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         liveView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        
+
         mutliView.translatesAutoresizingMaskIntoConstraints = false
         mutliView.leadingAnchor.constraint(equalTo: liveView.liveCanvasView.trailingAnchor).isActive = true
         mutliView.topAnchor.constraint(equalTo: liveView.liveCanvasView.topAnchor).isActive = true
         mutliView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         mutliView.bottomAnchor.constraint(equalTo: liveView.liveCanvasView.bottomAnchor).isActive = true
     }
-    
+
     public func eventHandler() {
         liveView.onTapCloseLiveClosure = { [weak self] in
             self?.onTapCloseLive()
@@ -127,7 +132,7 @@ class MutliBroadcastingController: BaseViewController {
         liveView.setupRemoteVideoClosure = { [weak self] canvas, connection in
             self?.agoraKit?.setupRemoteVideoEx(canvas, connection: connection)
         }
-        
+
         mutliView.joinTheBroadcasting = { [weak self] isBroadcast in
             guard let self = self else { return }
             self.channelMediaOptions.publishCameraTrack = .of(isBroadcast)
@@ -137,23 +142,21 @@ class MutliBroadcastingController: BaseViewController {
             let type: [LiveBottomView.LiveBottomType] = isBroadcast ? [.gift, .tool, .close] : [.gift, .close]
             self.liveView.updateBottomButtonType(type: type)
         }
-        
+
         guard getRole(uid: UserInfo.uid) == .audience else { return }
         SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
+
         }, onUpdated: { object in
-            
+
         }, onDeleted: { object in
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
-            
-        }, fail: { error in
-            
+        }, onSubscribed: {}, fail: { error in
+
         })
     }
-    
+
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
@@ -165,7 +168,7 @@ class MutliBroadcastingController: BaseViewController {
             navigationController?.popViewController(animated: true)
         }
     }
-        
+
     private func setupAgoraKit() {
         guard agoraKit == nil else { return }
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
@@ -176,9 +179,9 @@ class MutliBroadcastingController: BaseViewController {
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
-    
+
     private func joinChannel(channelName: String, uid: UInt) {
-        channelMediaOptions.clientRoleType = .of((Int32)(getRole(uid: "\(uid)").rawValue))
+        channelMediaOptions.clientRoleType = .of(Int32(getRole(uid: "\(uid)").rawValue))
         channelMediaOptions.publishMicrophoneTrack = .of(getRole(uid: "\(uid)") == .broadcaster)
         channelMediaOptions.publishCameraTrack = .of(getRole(uid: "\(uid)") == .broadcaster)
         let result = agoraKit?.joinChannel(byToken: KeyCenter.Token, channelId: channelName, info: nil, uid: uid, joinSuccess: nil)
@@ -198,39 +201,39 @@ class MutliBroadcastingController: BaseViewController {
         agoraKit?.startPreview()
         liveView.sendMessage(userName: UserInfo.uid, message: "Join_Live_Room".localized, messageType: .message)
     }
-    
+
     public func leaveChannel(uid: UInt, channelName: String, isExit: Bool = false) {
         agoraKit?.leaveChannel({ state in
             LogUtils.log(message: "leave channel: \(state)", level: .info)
         })
     }
-    
+
     public func didOfflineOfUid(uid: UInt) {
-        guard "\(uid)" != currentUserId else { return }
+        guard currentUserId != "\(uid)" else { return }
         liveView.sendMessage(userName: "\(uid)",
                              message: "Leave_Live_Room".localized,
                              messageType: .message)
     }
-    
+
     deinit {
         LogUtils.log(message: "释放 === \(self)", level: .info)
     }
 }
 
 extension MutliBroadcastingController: AgoraRtcEngineDelegate {
-    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         LogUtils.log(message: "error: \(errorCode)", level: .error)
         showAlert(title: "Error", message: "Error \(errorCode.description) occur")
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
         liveView.sendMessage(userName: "\(uid)", message: "Join_Live_Room".localized, messageType: .message)
@@ -248,12 +251,12 @@ extension MutliBroadcastingController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        localVideo.statsInfo?.updateLocalAudioStats(stats)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        remoteVideo.statsInfo?.updateVideoStats(stats)
         LogUtils.log(message: "remoteVideoWidth== \(stats.width) Height == \(stats.height)", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        remoteVideo.statsInfo?.updateAudioStats(stats)
     }

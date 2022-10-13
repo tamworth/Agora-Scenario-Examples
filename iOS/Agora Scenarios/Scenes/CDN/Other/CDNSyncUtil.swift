@@ -33,27 +33,29 @@ class CDNSyncUtil {
     private var currentMemberId: String!
     fileprivate var lastUserIdPKValue = ""
     let queue = DispatchQueue(label: "queue.SuperAppSyncUtil")
-    
-    typealias CompltedBlock = (LocalizedError?) -> ()
-    typealias SuccessBlockStrings = ([String]) -> ()
-    typealias SuccessBlockString = (String) -> ()
-    typealias FailBlockLocalizedError = (LocalizedError) -> ()
+
+    typealias CompltedBlock = (LocalizedError?) -> Void
+    typealias SuccessBlockStrings = ([String]) -> Void
+    typealias SuccessBlockString = (String) -> Void
+    typealias FailBlockLocalizedError = (LocalizedError) -> Void
     weak var delegate: CDNSyncUtilDelegate?
-    
+
     init(appId: String,
          sceneId: String,
          sceneName: String,
          userId: String,
-         userName: String) {
+         userName: String)
+    {
         self.appId = appId
         self.sceneId = sceneId
         self.sceneName = sceneName
         self.userId = userId
         self.userName = userName
     }
-    
+
     func joinByAudience(roomItem: CDNRoomInfo,
-                        complted: CompltedBlock? = nil) {
+                        complted: CompltedBlock? = nil)
+    {
         queue.async { [weak self] in
             self?.joinScene(roomInfo: roomItem, completion: {
                 self?.addMember()
@@ -61,9 +63,10 @@ class CDNSyncUtil {
             })
         }
     }
-    
+
     func joinByHost(roomInfo: CDNRoomInfo,
-                    complted: CompltedBlock? = nil) {
+                    complted: CompltedBlock? = nil)
+    {
         queue.async { [weak self] in
             self?.joinScene(roomInfo: roomInfo, completion: {
                 self?.resetPKInfo()
@@ -72,7 +75,7 @@ class CDNSyncUtil {
             })
         }
     }
-    
+
     private func joinScene(roomInfo: CDNRoomInfo, completion: @escaping () -> Void) {
         SyncUtil.joinScene(id: sceneId, userId: userId, property: roomInfo.dict) { _ in
             completion()
@@ -81,10 +84,10 @@ class CDNSyncUtil {
             LogUtils.log(message: msg, level: .error)
         }
     }
-    
+
     private func addMember() { /** 把本地用户添加到人员列表 **/
         let userInfo = CDNUserInfo(userId: userId,
-                                        userName: userName)
+                                   userName: userName)
         SyncUtil.scene(id: sceneId)?.collection(className: "member").add(data: userInfo.dict, success: { obj in
             LogUtils.log(message: "addMember success", level: .info)
             let id = obj.getId()
@@ -94,31 +97,32 @@ class CDNSyncUtil {
             LogUtils.log(message: msg, level: .error)
         })
     }
-    
+
     func getMembers(success: @escaping SuccessBlockStrings,
-                    fail: FailBlockLocalizedError?) {
+                    fail: FailBlockLocalizedError?)
+    {
         SyncUtil.scene(id: sceneId)?.collection(className: "member").get(success: { objs in
             let members = objs.compactMap({ $0.toJson() })
             success(members)
         }, fail: fail)
     }
-    
+
     func subscribePKInfo() {
         SyncUtil.scene(id: sceneId)?.subscribe(key: "", onUpdated: onPkInfoUpdated(object:), onDeleted: onPkInfoDeleted(object:), fail: { error in
             let msg = "subscribePKInfo fail: \(error.errorDescription ?? "")"
             LogUtils.log(message: msg, level: .error)
         })
     }
-    
+
     func unsubscribePKInfo() {
         SyncUtil.scene(id: sceneId)?.unsubscribe(key: "")
     }
-    
+
     func updatePKInfo(userIdPK: String) { /** only host can invoke pk **/
         if userIdPK.count == 0 {
             fatalError("muts no empty string")
         }
-        
+
         let property = CDNPKInfo(userIdPK: userIdPK).dict
         SyncUtil.scene(id: sceneId)?.update(key: "", data: property, success: { obj in
             LogUtils.log(message: "updatePKInfo success)", level: .info)
@@ -127,7 +131,7 @@ class CDNSyncUtil {
             LogUtils.log(message: msg, level: .error)
         })
     }
-    
+
     func resetPKInfo() { /** host and audience can invoke cancle pk **/
         let property = CDNPKInfo(userIdPK: "").dict
         SyncUtil.scene(id: sceneId)?.update(key: "", data: property, success: { _ in
@@ -137,22 +141,23 @@ class CDNSyncUtil {
             LogUtils.log(message: msg, level: .error)
         })
     }
-    
+
     func getPKInfo(success: @escaping SuccessBlockString,
-                     fail: @escaping FailBlockLocalizedError) {
+                   fail: @escaping FailBlockLocalizedError)
+    {
         SyncUtil.scene(id: sceneId)?.get(key: "", success: { obj in
             if let data = obj?.toJson()?.data(using: .utf8) {
                 let decoder = JSONDecoder()
                 do {
                     let roomInfo = try decoder.decode(CDNPKInfo.self, from: data)
                     success(roomInfo.userIdPK)
-                } catch let error {
+                } catch {
                     fail(error as! LocalizedError)
                 }
             }
         }, fail: fail)
     }
-    
+
     func leaveByAudience() {
         unsubscribePKInfo()
         if let id = currentMemberId {
@@ -160,7 +165,7 @@ class CDNSyncUtil {
         }
         resetPKInfo()
     }
-    
+
     func leaveByHost() {
         unsubscribePKInfo()
         SyncUtil.scene(id: sceneId)?.deleteScenes()
@@ -177,25 +182,25 @@ extension CDNSyncUtil {
             guard lastUserIdPKValue != userIdPK else { /** filter same **/
                 return
             }
-            
+
             if userIdPK.count > 0, userIdPK == userId {
                 lastUserIdPKValue = userIdPK
                 invokeDidPkAcceptForMe(userIdPK: userIdPK)
                 return
             }
-            
+
             if userIdPK.count > 0, userIdPK != userId {
                 lastUserIdPKValue = userIdPK
                 invokeDidPkAcceptForOther()
                 return
             }
-            
+
             if userIdPK.count == 0, lastUserIdPKValue == userId {
                 lastUserIdPKValue = userIdPK
                 invokeDidPkCancleForMe()
                 return
             }
-            
+
             if userIdPK.count == 0, lastUserIdPKValue != userId {
                 lastUserIdPKValue = userIdPK
                 invokeDidPkCancleForOther()
@@ -203,7 +208,7 @@ extension CDNSyncUtil {
             }
         }
     }
-    
+
     func onPkInfoDeleted(object: IObject) {
         if object.getId() == sceneId {
             invokeDidSceneClose()
@@ -218,65 +223,65 @@ extension CDNSyncUtil {
                                                   userIdPK: userIdPK)
             return
         }
-        
+
         DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
+            guard let self = self else { return }
             self.delegate?.CDNSyncUtilDidPkAcceptForMe(util: self,
                                                        userIdPK: userIdPK)
         }
     }
-    
+
     func invokeDidPkCancleForMe() {
         if Thread.isMainThread {
             delegate?.CDNSyncUtilDidPkCancleForMe(util: self)
             return
         }
-        
+
         DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
+            guard let self = self else { return }
             self.delegate?.CDNSyncUtilDidPkCancleForMe(util: self)
         }
     }
-    
+
     func invokeDidPkAcceptForOther() {
         if Thread.isMainThread {
             delegate?.CDNSyncUtilDidPkAcceptForOther(util: self)
             return
         }
-        
+
         DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
+            guard let self = self else { return }
             self.delegate?.CDNSyncUtilDidPkAcceptForOther(util: self)
         }
     }
-    
+
     func invokeDidPkCancleForOther() {
         if Thread.isMainThread {
             delegate?.CDNSyncUtilDidPkCancleForOther(util: self)
             return
         }
-        
+
         DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
+            guard let self = self else { return }
             self.delegate?.CDNSyncUtilDidPkCancleForMe(util: self)
         }
     }
-    
+
     func invokeDidSceneClose() {
         if Thread.isMainThread {
             delegate?.CDNSyncUtilDidSceneClose(util: self)
             return
         }
-        
+
         DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
+            guard let self = self else { return }
             self.delegate?.CDNSyncUtilDidSceneClose(util: self)
         }
     }
 }
 
-extension String {
-    fileprivate static var defaultLogTag: String {
+fileprivate extension String {
+    static var defaultLogTag: String {
         return "SuperAppSyncUtil"
     }
 }

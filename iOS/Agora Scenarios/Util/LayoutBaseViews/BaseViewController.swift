@@ -5,19 +5,20 @@
 //  Created by zhaoyongqiang on 2021/11/1.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class BaseViewController: UIViewController {
     lazy var backButton: AGEButton = {
         let button = AGEButton()
         button.setImage(UIImage(systemName: "chevron.backward")?
-                            .withTintColor(.white, renderingMode: .alwaysOriginal),
-                        for: .normal)
+            .withTintColor(.white, renderingMode: .alwaysOriginal),
+            for: .normal)
         button.contentHorizontalAlignment = .left
         button.addTarget(self, action: #selector(onTapBackButton), for: .touchUpInside)
         return button
     }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.contents = UIImage(named: "default_bg")?.cgImage
@@ -26,7 +27,7 @@ class BaseViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
     }
-    
+
     private func setupNavigationBar() {
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
         navigationController?.navigationBar.barTintColor = UIColor(hex: "#0090f3")
@@ -40,7 +41,7 @@ class BaseViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
-    
+
     func navigationTransparent(isTransparent: Bool, isHiddenNavBar: Bool = false) {
         let image = isTransparent ? UIImage() : nil
         navigationController?.navigationBar.setBackgroundImage(image, for: .any, barMetrics: .default)
@@ -55,6 +56,7 @@ class BaseViewController: UIViewController {
         alertController.addAction(action)
         present(alertController, animated: true, completion: nil)
     }
+
     func showAlert(title: String? = nil, message: String, confirm: @escaping () -> Void) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "Confirm".localized, style: .default) { _ in
@@ -65,6 +67,7 @@ class BaseViewController: UIViewController {
         alertController.addAction(cancel)
         present(alertController, animated: true, completion: nil)
     }
+
     func showAlert(title: String? = nil, message: String, cancel: (() -> Void)?, confirm: @escaping () -> Void) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "Confirm".localized, style: .default) { _ in
@@ -77,6 +80,7 @@ class BaseViewController: UIViewController {
         alertController.addAction(cancel)
         present(alertController, animated: true, completion: nil)
     }
+
     func showTextFieldAlert(title: String? = nil, message: String, confirm: @escaping (String) -> Void) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addTextField { field in
@@ -91,24 +95,24 @@ class BaseViewController: UIViewController {
         alertController.addAction(cancel)
         present(alertController, animated: true, completion: nil)
     }
-    
+
     @objc
     func onTapBackButton() {
         navigationController?.popViewController(animated: true)
     }
-    
+
     /** 程序进入前台 开始活跃 */
     @objc
-    public func appBecomeActive() { }
-    
+    public func appBecomeActive() {}
+
     /** 程序进入后台 */
     @objc
-    public func appEnterBackground() { }
-    
+    public func appEnterBackground() {}
+
     /** 程序被杀死 */
     @objc
-    public func applicationWillTerminate() { }
-    
+    public func applicationWillTerminate() {}
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -122,45 +126,46 @@ extension BaseViewController: UIGestureRecognizerDelegate {
 
 enum LogLevel {
     case info, warning, error
-    
+
     var description: String {
         switch self {
-        case .info:    return "Info"
+        case .info: return "Info"
         case .warning: return "Warning"
-        case .error:   return "Error"
+        case .error: return "Error"
         }
     }
 }
 
 struct LogItem {
-    var message:String
-    var level:LogLevel
-    var dateTime:Date
+    var message: String
+    var level: LogLevel
+    var dateTime: Date
 }
 
-class LogUtils {
-    static var logs:[LogItem] = []
-    static var appLogPath:String = "\(logFolder())/app-\(Date().getFormattedDate(format: "yyyy-MM-dd")).log"
-    
+enum LogUtils {
+    static var logs: [LogItem] = []
+    static var appLogPath: String = "\(logFolder())/app-\(Date().getFormattedDate(format: "yyyy-MM-dd")).log"
+
     static func log(message: String, level: LogLevel) {
         LogUtils.logs.append(LogItem(message: message, level: level, dateTime: Date()))
         print("\(level.description): \(message)")
     }
-    
+
     static func logFolder() -> String {
         let folder = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])/logs"
         try? FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true, attributes: nil)
         return folder
     }
+
     static func sdkLogPath() -> String {
         let logPath = "\(logFolder())/agorasdk.log"
         return logPath
     }
-    
+
     static func removeAll() {
         LogUtils.logs.removeAll()
     }
-    
+
     static func writeAppLogsToDisk() {
         if let outputStream = OutputStream(url: URL(fileURLWithPath: LogUtils.appLogPath), append: true) {
             outputStream.open()
@@ -175,7 +180,7 @@ class LogUtils {
             print("Unable to open file")
         }
     }
-    
+
     static func cleanUp() {
         try? FileManager.default.removeItem(at: URL(fileURLWithPath: LogUtils.logFolder(), isDirectory: true))
     }

@@ -5,12 +5,12 @@
 //  Created by zhaoyongqiang on 2022/4/15.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class ClubRoomListView: UIView {
     var didClubItemClosure: ((LiveRoomInfo) -> Void)?
-    
+
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel()
         label.text = "房间列表"
@@ -18,6 +18,7 @@ class ClubRoomListView: UIView {
         label.fontStyle = .large
         return label
     }()
+
     private lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         view.delegate = self
@@ -34,31 +35,33 @@ class ClubRoomListView: UIView {
                       forCellWithReuseIdentifier: LiveRoomListCell.description())
         return view
     }()
+
     private var dataArray = [LiveRoomInfo]()
     private var videoUrl: String = ""
-    
+
     init(videoUrl: String) {
         super.init(frame: .zero)
         self.videoUrl = videoUrl
         setupUI()
         getLiveData(videoUrl: videoUrl)
     }
-        
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func getLiveData(videoUrl: String) {
         SyncUtil.fetchAll { results in
             self.collectionView.endRefreshing()
-            self.dataArray = results.compactMap({ $0.toJson() }).compactMap({ JSONObject.toModel(LiveRoomInfo.self, value: $0 )}).filter({ $0.videoUrl == videoUrl})
+            self.dataArray = results.compactMap({ $0.toJson() }).compactMap({ JSONObject.toModel(LiveRoomInfo.self, value: $0) }).filter({ $0.videoUrl == videoUrl })
             self.collectionView.dataArray = self.dataArray
         } fail: { error in
             self.collectionView.endRefreshing()
             LogUtils.log(message: "get live data error == \(error.localizedDescription)", level: .info)
         }
     }
-    
+
     private func setupUI() {
         backgroundColor = UIColor(hex: "#0E141D")
         collectionView.backgroundColor = backgroundColor
@@ -67,11 +70,11 @@ class ClubRoomListView: UIView {
         translatesAutoresizingMaskIntoConstraints = false
         widthAnchor.constraint(equalToConstant: Screen.height).isActive = true
         heightAnchor.constraint(equalToConstant: Screen.height * 0.7).isActive = true
-        
+
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15).isActive = true
-        
+
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20).isActive = true
@@ -85,12 +88,14 @@ extension ClubRoomListView: AGECollectionViewDelegate {
         guard let item = self.collectionView.dataArray?[indexPath.item] as? LiveRoomInfo else { return }
         didClubItemClosure?(item)
     }
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.description(),
                                                       for: indexPath) as! VideoCollectionViewCell
         cell.setupItemData(with: self.collectionView.dataArray?[indexPath.item])
         return cell
     }
+
     func pullToRefreshHandler() {
         getLiveData(videoUrl: videoUrl)
     }

@@ -5,9 +5,9 @@
 //  Created by zhaoyongqiang on 2022/7/26.
 //
 
-import UIKit
 import Agora_Scene_Utils
 import AgoraRtcKit
+import UIKit
 
 class VideoCallViewController: BaseViewController {
     private lazy var localContainerView: AGEView = {
@@ -25,6 +25,7 @@ class VideoCallViewController: BaseViewController {
         view.addGestureRecognizer(pan)
         return view
     }()
+
     private lazy var localView: AGEView = {
         let view = AGEView()
         view.backgroundColor = .gray
@@ -32,10 +33,12 @@ class VideoCallViewController: BaseViewController {
         view.layer.masksToBounds = true
         return view
     }()
+
     private lazy var remoteView: AGEView = {
         let view = AGEView()
         return view
     }()
+
     private lazy var switchCamera: AGEButton = {
         let button = AGEButton(style: .switchCamera(imageColor: .white), colorStyle: .white)
         button.addTarget(self, action: #selector(onTapSwitchCamera(sender:)), for: .touchUpInside)
@@ -43,6 +46,7 @@ class VideoCallViewController: BaseViewController {
         button.backgroundColor = .black.withAlphaComponent(0.6)
         return button
     }()
+
     private lazy var closButton: AGEButton = {
         let button = AGEButton(style: .imageName(name: "VideoCall/Hangup"), colorStyle: .white)
         button.addTarget(self, action: #selector(onTapCloseButton(sender:)), for: .touchUpInside)
@@ -50,6 +54,7 @@ class VideoCallViewController: BaseViewController {
         button.backgroundColor = .red
         return button
     }()
+
     private lazy var micButton: AGEButton = {
         let button = AGEButton(style: .mic(imageColor: .white), colorStyle: .white)
         button.addTarget(self, action: #selector(onTapMicButton(sender:)), for: .touchUpInside)
@@ -57,11 +62,13 @@ class VideoCallViewController: BaseViewController {
         button.backgroundColor = .black.withAlphaComponent(0.6)
         return button
     }()
+
     private lazy var timeLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .middle)
         label.text = "00:00"
         return label
     }()
+
     private var agoraKit: AgoraRtcEngineKit?
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
         let config = AgoraRtcEngineConfig()
@@ -70,6 +77,7 @@ class VideoCallViewController: BaseViewController {
         config.areaCode = .global
         return config
     }()
+
     private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
         let option = AgoraRtcChannelMediaOptions()
         option.autoSubscribeAudio = .of(true)
@@ -79,6 +87,7 @@ class VideoCallViewController: BaseViewController {
         option.publishCameraTrack = .of(true)
         return option
     }()
+
     private lazy var localCanvas: AgoraRtcVideoCanvas = {
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = UserInfo.userId
@@ -86,35 +95,38 @@ class VideoCallViewController: BaseViewController {
         canvas.view = localView
         return canvas
     }()
+
     private lazy var remoteCanvas: AgoraRtcVideoCanvas = {
         let canvas = AgoraRtcVideoCanvas()
         canvas.renderMode = .hidden
         canvas.view = remoteView
         return canvas
     }()
+
     private var isChangeView: Bool = false
     private var timer = GCDTimer()
-    
+
     private var userObjectId: String = ""
     private(set) var channleName: String = ""
     private(set) var currentUserId: String = ""
-    
+
     /// 用户角色
     public func getRole(uid: String) -> AgoraClientRole {
         uid == currentUserId ? .broadcaster : .audience
     }
-    
+
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
-        self.channleName = channelName
+        channleName = channelName
         self.agoraKit = agoraKit
-        self.currentUserId = userId
+        currentUserId = userId
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -123,12 +135,12 @@ class VideoCallViewController: BaseViewController {
         // 设置屏幕常亮
         UIApplication.shared.isIdleTimerDisabled = true
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationTransparent(isTransparent: true, isHiddenNavBar: true)
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = currentUserId != "\(UserInfo.userId)"
@@ -137,7 +149,7 @@ class VideoCallViewController: BaseViewController {
         controllers.remove(at: index)
         navigationController?.viewControllers = controllers
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel(uid: UserInfo.userId, channelName: channleName, isExit: true)
@@ -156,7 +168,7 @@ class VideoCallViewController: BaseViewController {
         agoraKit?.disableVideo()
         AgoraRtcEngineKit.destroy()
     }
-    
+
     private func eventHandler() {
         SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { list in
             if list.count > 1 {
@@ -176,20 +188,18 @@ class VideoCallViewController: BaseViewController {
 
         guard getRole(uid: UserInfo.uid) == .audience else { return }
         SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
+
         }, onUpdated: { object in
-            
+
         }, onDeleted: { [weak self] object in
             self?.showAlert(title: "end_of_call".localized, message: "") {
                 self?.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
-            
-        }, fail: { error in
-            
+        }, onSubscribed: {}, fail: { error in
+
         })
     }
-    
+
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "end_of_call".localized, message: "end_the_call".localized) { [weak self] in
@@ -201,7 +211,7 @@ class VideoCallViewController: BaseViewController {
             navigationController?.popViewController(animated: true)
         }
     }
-        
+
     private func setupAgoraKit() {
         guard agoraKit == nil else { return }
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
@@ -212,7 +222,7 @@ class VideoCallViewController: BaseViewController {
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
-    
+
     private func joinChannel(channelName: String, uid: UInt) {
         let connection = AgoraRtcConnection()
         connection.channelId = channelName
@@ -224,17 +234,17 @@ class VideoCallViewController: BaseViewController {
         agoraKit?.setupLocalVideo(localCanvas)
         agoraKit?.startPreview()
     }
-    
+
     private func leaveChannel(uid: UInt, channelName: String, isExit: Bool = false) {
         agoraKit?.leaveChannel({ state in
             LogUtils.log(message: "leave channel: \(state)", level: .info)
         })
     }
-    
+
     deinit {
         LogUtils.log(message: "释放 === \(self)", level: .info)
     }
-    
+
     private func setupUI() {
         view.addSubview(remoteView)
         view.addSubview(localContainerView)
@@ -250,12 +260,11 @@ class VideoCallViewController: BaseViewController {
         closButton.translatesAutoresizingMaskIntoConstraints = false
         micButton.translatesAutoresizingMaskIntoConstraints = false
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        
+
         remoteView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         remoteView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         remoteView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        remoteView.bottomAnchor.constraint(equalTo:  view.bottomAnchor).isActive = true
+        remoteView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         localView.leadingAnchor.constraint(equalTo: localContainerView.leadingAnchor).isActive = true
         localView.topAnchor.constraint(equalTo: localContainerView.topAnchor).isActive = true
         localView.trailingAnchor.constraint(equalTo: localContainerView.trailingAnchor).isActive = true
@@ -279,21 +288,24 @@ class VideoCallViewController: BaseViewController {
         timeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: Screen.statusHeight() + 20).isActive = true
     }
-    
+
     @objc
     private func onTapSwitchCamera(sender: UIButton) {
         agoraKit?.switchCamera()
     }
+
     @objc
     private func onTapCloseButton(sender: UIButton) {
         onTapCloseLive()
     }
+
     @objc
     private func onTapMicButton(sender: AGEButton) {
         sender.isSelected = !sender.isSelected
         sender.buttonStyle = sender.isSelected ? .muteMic(imageColor: .white) : .mic(imageColor: .white)
         agoraKit?.muteLocalVideoStream(sender.isSelected)
     }
+
     @objc
     private func onTapLocalViewGesture(sender: UITapGestureRecognizer) {
         isChangeView = !isChangeView
@@ -312,11 +324,12 @@ class VideoCallViewController: BaseViewController {
             agoraKit?.setupRemoteVideoEx(remoteCanvas, connection: connection)
         }
     }
+
     @objc
     private func onPanLocalViewGesture(sender: UIPanGestureRecognizer) {
         let point = sender.location(in: view)
         localContainerView.center = point
-        
+
         switch sender.state {
         case .cancelled, .ended, .failed:
             let minX = localContainerView.frame.minX
@@ -342,25 +355,26 @@ class VideoCallViewController: BaseViewController {
                     self.localContainerView.frame.origin.y = self.view.frame.height - self.localContainerView.frame.height - 140.fit
                 }
             }
-            
+
         default: break
         }
     }
 }
+
 extension VideoCallViewController: AgoraRtcEngineDelegate {
-    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
         LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
     }
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         LogUtils.log(message: "error: \(errorCode)", level: .error)
         showAlert(title: "Error", message: "Error \(errorCode.description) occur")
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
         let connection = AgoraRtcConnection()
@@ -383,16 +397,16 @@ extension VideoCallViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
 //        localVideo.statsInfo?.updateChannelStats(stats)
     }
- 
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        localVideo.statsInfo?.updateLocalAudioStats(stats)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        remoteVideo.statsInfo?.updateVideoStats(stats)
         LogUtils.log(message: "remoteVideoWidth== \(stats.width) Height == \(stats.height)", level: .info)
     }
-    
+
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        remoteVideo.statsInfo?.updateAudioStats(stats)
     }

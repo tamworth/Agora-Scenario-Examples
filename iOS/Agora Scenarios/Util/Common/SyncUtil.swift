@@ -6,13 +6,13 @@
 //
 
 import UIKit
-//import AgoraSyncManager
+// import AgoraSyncManager
 
 class SyncUtil: NSObject {
     private static var manager: AgoraSyncManager?
-    private override init() { }
-    private static var sceneRefs: [String: SceneReference] = [String: SceneReference]()
-    
+    override private init() {}
+    private static var sceneRefs: [String: SceneReference] = .init()
+
     static func initSyncManager(sceneId: String, complete: @escaping SuccessBlockVoid) {
 //        let config = AgoraSyncManager.RtmConfig(appId: KeyCenter.AppId,
 //                                                channelName: sceneId)
@@ -37,12 +37,13 @@ class SyncUtil: NSObject {
             }
         })
     }
-    
+
     class func joinScene(id: String,
                          userId: String,
                          property: [String: Any]?,
                          success: SuccessBlockObj? = nil,
-                         fail: FailBlock? = nil) {
+                         fail: FailBlock? = nil)
+    {
         guard let manager = manager else { return }
         let jsonString = JSONObject.toJsonString(dict: property) ?? ""
         let params = JSONObject.toDictionary(jsonStr: jsonString)
@@ -59,15 +60,15 @@ class SyncUtil: NSObject {
             fail?(error)
         }
     }
-    
+
     class func scene(id: String) -> SceneReference? {
         sceneRefs[id]
     }
-    
+
     class func fetchAll(success: SuccessBlock? = nil, fail: FailBlock? = nil) {
         manager?.getScenes(success: success, fail: fail)
     }
-    
+
     class func leaveScene(id: String) {
         sceneRefs.removeValue(forKey: id)
     }

@@ -12,15 +12,17 @@ class LivePlayerCell: UICollectionViewCell {
         let view = UIView()
         return view
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         liveView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(liveView)
@@ -29,7 +31,7 @@ class LivePlayerCell: UICollectionViewCell {
         liveView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         liveView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 44).isActive = true
     }
-    
+
     func setupPlayerCanvas(with item: Any?) {
         guard let model = item as? LiveCanvasModel else { return }
         model.canvas?.view = liveView

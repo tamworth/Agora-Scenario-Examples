@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/12/20.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class NoticeCell: UITableViewCell {
     private lazy var containerView: UIView = {
@@ -16,7 +16,7 @@ class NoticeCell: UITableViewCell {
         view.layer.masksToBounds = true
         return view
     }()
-    
+
     private lazy var noticeLabel: AGELabel = {
         let label = AGELabel()
         label.numberOfLines = 0
@@ -26,9 +26,9 @@ class NoticeCell: UITableViewCell {
         let attach = NSTextAttachment(image: image)
         attach.bounds = CGRect(x: 0, y: -7, width: 20, height: 20)
         attrs.append(NSAttributedString(attachment: attach))
-        
+
         let attr = NSAttributedString(string: "公告: ", attributes: [.foregroundColor: UIColor.white,
-                                                                    .font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+                                                                   .font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.append(attr)
         let contentAttr = NSAttributedString(string: "在公屏上打出“主播yyds”有机会和主播一起玩游戏哦！！！",
                                              attributes: [.foregroundColor: UIColor.white])
@@ -41,11 +41,12 @@ class NoticeCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
@@ -53,12 +54,12 @@ class NoticeCell: UITableViewCell {
         noticeLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(containerView)
         containerView.addSubview(noticeLabel)
-        
+
         containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         containerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
         containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
+
         noticeLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 19).isActive = true
         noticeLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 15).isActive = true
         noticeLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -15).isActive = true

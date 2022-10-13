@@ -11,26 +11,26 @@ struct CDNRoomInfo: Codable {
     let roomId: String
     let roomName: String
     let liveMode: LiveMode
-    
+
     static func create(jsonString: String) -> CDNRoomInfo? {
         let decoder = JSONDecoder()
         guard let data = jsonString.data(using: .utf8) else {
             return nil
         }
-        
+
         do {
             let item = try decoder.decode(CDNRoomInfo.self, from: data)
             return item
-        } catch let error {
+        } catch {
             LogUtils.log(message: error.localizedDescription, level: .error)
             return nil
         }
     }
-    
-    var dict: [String : String] {
-        return ["roomId" : roomId,
-                "roomName" : roomName,
-                "liveMode" : liveMode.rawValue]
+
+    var dict: [String: String] {
+        return ["roomId": roomId,
+                "roomName": roomName,
+                "liveMode": liveMode.rawValue]
     }
 }
 

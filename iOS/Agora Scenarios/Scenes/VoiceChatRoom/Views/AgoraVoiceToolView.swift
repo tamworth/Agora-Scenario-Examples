@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2022/1/27.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class AgoraVoiceToolView: UIView {
     var onTapItemClosure: ((LiveToolType, Bool) -> Void)?
@@ -15,6 +15,7 @@ class AgoraVoiceToolView: UIView {
         label.text = "工具".localized
         return label
     }()
+
     public lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         view.itemSize = CGSize(width: 80, height: 100)
@@ -25,16 +26,18 @@ class AgoraVoiceToolView: UIView {
         view.register(LiveToolViewCell.self, forCellWithReuseIdentifier: LiveToolViewCell.description())
         return view
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         updateToolType(type: [.mic, .earphone_monitor, .music, .backgroundImage, .real_time_data])
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func updateToolType(type: [LiveToolType]) {
         var datas = [LiveToolModel]()
         type.forEach({
@@ -47,21 +50,21 @@ class AgoraVoiceToolView: UIView {
         })
         collectionView.dataArray = datas
     }
-    
+
     private func setupUI() {
         backgroundColor = .init(hex: "#4F506A")
         layer.cornerRadius = 10
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
-        
+
         addSubview(titleLabel)
         addSubview(collectionView)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15).isActive = true
-        
+
         collectionView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
@@ -69,13 +72,14 @@ class AgoraVoiceToolView: UIView {
         collectionView.heightAnchor.constraint(equalToConstant: 140).isActive = true
     }
 }
+
 extension AgoraVoiceToolView: AGECollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LiveToolViewCell.description(), for: indexPath) as! LiveToolViewCell
         cell.setToolData(item: self.collectionView.dataArray?[indexPath.item])
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) as? LiveToolViewCell,
               let model = self.collectionView.dataArray?[indexPath.item] as? LiveToolModel else { return }

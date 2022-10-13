@@ -7,14 +7,13 @@
 
 import Foundation
 
-public typealias SuccessBlockInt = (Int) -> ()
-public typealias SuccessBlock = ([IObject]) -> ()
-public typealias SuccessBlockVoid = () -> ()
-public typealias SuccessBlockObj = (IObject) -> ()
-public typealias SuccessBlockObjOptional = (IObject?) -> ()
-public typealias SuccessBlockObjSceneRef = (SceneReference) -> ()
-public typealias FailBlock = (SyncError) -> ()
+public typealias SuccessBlockInt = (Int) -> Void
+public typealias SuccessBlock = ([IObject]) -> Void
+public typealias SuccessBlockVoid = () -> Void
+public typealias SuccessBlockObj = (IObject) -> Void
+public typealias SuccessBlockObjOptional = (IObject?) -> Void
+public typealias SuccessBlockObjSceneRef = (SceneReference) -> Void
+public typealias FailBlock = (SyncError) -> Void
 
 public typealias OnSubscribeBlock = SuccessBlockObj
 public typealias OnSubscribeBlockVoid = SuccessBlockVoid
-

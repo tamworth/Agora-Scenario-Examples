@@ -5,27 +5,29 @@
 //  Created by zhaoyongqiang on 2022/4/22.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class AgoraClubProgramCell: UITableViewCell {
     private lazy var bgImageView: AGEImageView = {
         let imageView = AGEImageView(imageName: "playing")
         return imageView
     }()
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupData(model: AgoraClubProgramModel) {
         bgImageView.image = UIImage(named: model.type.rawValue)
     }
-    
+
     private func setupUI() {
         backgroundColor = .clear
         contentView.addSubview(bgImageView)

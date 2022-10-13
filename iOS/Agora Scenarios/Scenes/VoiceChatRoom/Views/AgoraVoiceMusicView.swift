@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2022/1/27.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class AgoraVoiceMusicView: UIView {
     var onTapPlayButtonClosure: ((AgoraVoiceMusicModel?, Bool) -> Void)?
@@ -16,10 +16,12 @@ class AgoraVoiceMusicView: UIView {
         label.text = "BGM".localized
         return label
     }()
+
     private lazy var loudspeakerImageView: AGEImageView = {
         let imageView = AGEImageView(imageName: "icon-volume")
         return imageView
     }()
+
     private lazy var slider: AGESlider = {
         let slider = AGESlider()
         slider.tintColor = .init(hex: "#62626F")
@@ -34,6 +36,7 @@ class AgoraVoiceMusicView: UIView {
         slider.addTarget(self, action: #selector(onTapSliderChangeHandler(sender:)), for: .valueChanged)
         return slider
     }()
+
     private lazy var tableView: AGETableView = {
         let view = AGETableView()
         view.estimatedRowHeight = 44
@@ -42,19 +45,21 @@ class AgoraVoiceMusicView: UIView {
                       forCellWithReuseIdentifier: AgoraVoiceMusicViewCell.description())
         return view
     }()
+
     private var preCell: AgoraVoiceMusicViewCell?
     private var preModel: AgoraVoiceMusicModel?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         getMusicData()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func getMusicData() {
         NetworkManager.shared.getRequest(urlString: "http://api.agora.io/ent/v1/musics") { response in
             let datas = response["data"] as? [[String: Any]]
@@ -64,14 +69,14 @@ class AgoraVoiceMusicView: UIView {
             AGEToastView.show(text: error, view: self)
         }
     }
-    
+
     private func setupUI() {
         backgroundColor = .init(hex: "#4F506A")
         layer.cornerRadius = 10
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
-        
+
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         loudspeakerImageView.translatesAutoresizingMaskIntoConstraints = false
         slider.translatesAutoresizingMaskIntoConstraints = false
@@ -80,23 +85,24 @@ class AgoraVoiceMusicView: UIView {
         addSubview(loudspeakerImageView)
         addSubview(slider)
         addSubview(tableView)
-        
+
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15).isActive = true
-        
+
         loudspeakerImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15).isActive = true
         loudspeakerImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20).isActive = true
-        
+
         slider.leadingAnchor.constraint(equalTo: loudspeakerImageView.trailingAnchor, constant: 10).isActive = true
         slider.centerYAnchor.constraint(equalTo: loudspeakerImageView.centerYAnchor).isActive = true
         slider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true
-        
+
         tableView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         tableView.topAnchor.constraint(equalTo: loudspeakerImageView.bottomAnchor, constant: 20).isActive = true
         tableView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
         tableView.heightAnchor.constraint(equalToConstant: 300).isActive = true
     }
+
     @objc
     private func onTapSliderChangeHandler(sender: AGESlider) {
         onTapSliderValueChangeClosure?(sender.value)
@@ -110,19 +116,19 @@ extension AgoraVoiceMusicView: AGETableViewDelegate {
         cell.setupMusicData(model: model)
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let cell = tableView.cellForRow(at: indexPath) as? AgoraVoiceMusicViewCell
         if preCell != cell {
             preCell?.resetPlayButtonStatus()
         }
-        guard let model = self.tableView.dataArray?[indexPath.row] as? AgoraVoiceMusicModel else { return }        
+        guard let model = self.tableView.dataArray?[indexPath.row] as? AgoraVoiceMusicModel else { return }
         let isSelected = cell?.updatePlayButtonStatus() ?? true
         onTapPlayButtonClosure?(model, isSelected)
         preCell = cell
     }
-    
+
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let view = AGEView()
         view.backgroundColor = .clear
@@ -143,7 +149,7 @@ extension AgoraVoiceMusicView: AGETableViewDelegate {
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         return view
     }
-    
+
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         (self.tableView.dataArray?.isEmpty ?? true) ? 0 : 80
     }
@@ -157,58 +163,62 @@ class AgoraVoiceMusicViewCell: UITableViewCell {
         button.isUserInteractionEnabled = false
         return button
     }()
+
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .large)
         label.text = "asasfasfs"
         return label
     }()
+
     private lazy var detailLabel: AGELabel = {
         let label = AGELabel(colorStyle: .disabled)
         label.text = "asfagas"
         return label
     }()
+
     private var currentModel: AgoraVoiceMusicModel?
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupMusicData(model: AgoraVoiceMusicModel?) {
         currentModel = model
         titleLabel.text = model?.singer
         detailLabel.text = model?.musicName
     }
-    
+
     func updatePlayButtonStatus() -> Bool {
         playButton.isSelected = !playButton.isSelected
         return playButton.isSelected
     }
-    
+
     func resetPlayButtonStatus() {
         playButton.isSelected = false
     }
-    
+
     private func setupUI() {
         playButton.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         detailLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.backgroundColor = .clear
         backgroundColor = .clear
-        
+
         contentView.addSubview(playButton)
         contentView.addSubview(titleLabel)
         contentView.addSubview(detailLabel)
         playButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         playButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15).isActive = true
         playButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
-        
+
         titleLabel.leadingAnchor.constraint(equalTo: playButton.trailingAnchor, constant: 10).isActive = true
         titleLabel.bottomAnchor.constraint(equalTo: playButton.topAnchor, constant: 10).isActive = true
-        
+
         detailLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
         detailLabel.bottomAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 5).isActive = true
     }

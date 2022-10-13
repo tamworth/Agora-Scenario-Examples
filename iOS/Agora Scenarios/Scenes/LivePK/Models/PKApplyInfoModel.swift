@@ -32,7 +32,7 @@ struct PKApplyInfoModel: Codable {
     var roomId: String = ""
     /// 对方直播间的roomId
     var targetRoomId: String?
-    
+
     var timestamp: String? = "".timeStamp16
 }
 
@@ -44,6 +44,6 @@ struct PKInfoModel: Codable {
     var roomId: String = ""
     /// 用户id
     var userId: String = "\(UserInfo.userId)"
-    
+
     var timestamp: String? = "".timeStamp16
 }

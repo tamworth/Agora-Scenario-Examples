@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/11/10.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class LiveSettingView: UIView {
     var liveSettingFinishedClosure: ((LiveSettingUseData) -> Void)?
@@ -17,6 +17,7 @@ class LiveSettingView: UIView {
         button.addTarget(self, action: #selector(onTapBackButton), for: .touchUpInside)
         return button
     }()
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Live_Room_Settings".localized
@@ -24,6 +25,7 @@ class LiveSettingView: UIView {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var tableViewLayout: AGETableView = {
         let view = AGETableView()
         view.estimatedRowHeight = 100
@@ -36,10 +38,11 @@ class LiveSettingView: UIView {
         view.dataArray = LiveSettingModel.settingsData()
         return view
     }()
+
     private var isDetail: Bool = false
     private var dataArray = LiveSettingModel.settingsData()
     private var currentModel = LiveSettingUseData()
-    
+
     init(title: String, datas: [LiveSettingModel], useModel: LiveSettingUseData?, isDetail: Bool = false) {
         super.init(frame: .zero)
         setupUI()
@@ -49,11 +52,12 @@ class LiveSettingView: UIView {
         guard let model = useModel else { return }
         currentModel = model
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
@@ -78,12 +82,13 @@ class LiveSettingView: UIView {
         tableViewLayout.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         tableViewLayout.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
-    
+
     @objc
     private func onTapBackButton() {
         AlertManager.hiddenView(all: false)
     }
 }
+
 extension LiveSettingView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let datas = tableViewLayout.dataArray as? [LiveSettingModel] else { return UITableViewCell() }
@@ -110,7 +115,7 @@ extension LiveSettingView: AGETableViewDelegate {
         cell.setLiveSettingData(model: model)
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let dataArray = tableViewLayout.dataArray as? [LiveSettingModel] else { return }
         let model = dataArray[indexPath.row]
@@ -121,8 +126,8 @@ extension LiveSettingView: AGETableViewDelegate {
         }
         if (model.settingType == .frameRate || model.settingType == .resolution) && isDetail == false {
             let datas = model.title == "Resolution".localized
-            ? LiveSettingModel.resolutionData()
-            : LiveSettingModel.frameRateData()
+                ? LiveSettingModel.resolutionData()
+                : LiveSettingModel.frameRateData()
             let settintView = LiveSettingView(title: model.title, datas: datas, useModel: currentModel, isDetail: true)
             settintView.liveSettingFinishedClosure = liveSettingFinishedClosure
             AlertManager.show(view: settintView, alertPostion: .bottom)
@@ -141,6 +146,7 @@ class LiveSettingViewCell: UITableViewCell {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var descLabel: UILabel = {
         let label = UILabel()
         label.text = "240 X 240"
@@ -148,22 +154,25 @@ class LiveSettingViewCell: UITableViewCell {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var arrowImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right")?.withTintColor(.gray, renderingMode: .alwaysOriginal))
         imageView.isHidden = true
         return imageView
     }()
+
     private var descConstraint: NSLayoutConstraint?
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setLiveSettingData(model: LiveSettingModel) {
         titleLabel.text = model.title
         descLabel.text = model.desc
@@ -173,7 +182,7 @@ class LiveSettingViewCell: UITableViewCell {
             descConstraint?.isActive = true
         }
     }
-    
+
     private func setupUI() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         descLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -181,13 +190,13 @@ class LiveSettingViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(descLabel)
         contentView.addSubview(arrowImageView)
-        
+
         titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        
+
         arrowImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15).isActive = true
         arrowImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        
+
         descConstraint = descLabel.trailingAnchor.constraint(equalTo: arrowImageView.leadingAnchor, constant: -15)
         descLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15).isActive = true
         descLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
@@ -196,7 +205,7 @@ class LiveSettingViewCell: UITableViewCell {
 }
 
 class LiveSettingSliderViewCell: UITableViewCell {
-    var sliderValueChangeClosure:((Int) -> Void)?
+    var sliderValueChangeClosure: ((Int) -> Void)?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "分辨率"
@@ -204,6 +213,7 @@ class LiveSettingSliderViewCell: UITableViewCell {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var descLabel: UILabel = {
         let label = UILabel()
         label.text = "240 X 240"
@@ -211,6 +221,7 @@ class LiveSettingSliderViewCell: UITableViewCell {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var slideView: UISlider = {
         let slider = UISlider()
         slider.maximumTrackTintColor = .gray
@@ -221,32 +232,35 @@ class LiveSettingSliderViewCell: UITableViewCell {
         slider.addTarget(self, action: #selector(sliderValueTouchUpInside(sender:)), for: .touchUpInside)
         return slider
     }()
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     @objc
     private func sliderValueChangeHandler(sender: UISlider) {
         let value = Int(sender.value * 2000)
         descLabel.text = "\(value)kbps"
     }
+
     @objc
     private func sliderValueTouchUpInside(sender: UISlider) {
         let value = Int(sender.value * 2000)
         sliderValueChangeClosure?(value)
     }
-    
+
     func setLiveSettingData(model: LiveSettingModel) {
         titleLabel.text = model.title
         descLabel.text = "\(Int(model.sliderValue * 2000))kbps"
         slideView.setValue(model.sliderValue, animated: true)
     }
-    
+
     private func setupUI() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         descLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -254,13 +268,13 @@ class LiveSettingSliderViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(descLabel)
         contentView.addSubview(slideView)
-        
+
         titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15).isActive = true
-        
+
         descLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 10).isActive = true
         descLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
-        
+
         slideView.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
         slideView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
         slideView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true

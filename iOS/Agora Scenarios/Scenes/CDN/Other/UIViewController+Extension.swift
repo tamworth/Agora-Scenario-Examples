@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 extension BaseViewController {
     func show(_ text: String) {
         ToastView.show(text: text)

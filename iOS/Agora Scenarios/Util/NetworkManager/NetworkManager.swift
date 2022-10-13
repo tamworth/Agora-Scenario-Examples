@@ -9,15 +9,15 @@ import UIKit
 
 class NetworkManager {
     enum HTTPMethods: String {
-        case GET = "GET"
-        case POST = "POST"
+        case GET
+        case POST
     }
-    
+
     var gameToken: String = ""
-    
+
     typealias SuccessClosure = ([String: Any]) -> Void
     typealias FailClosure = (String) -> Void
-    
+
     private lazy var sessionConfig: URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["Content-Type": "application/json",
@@ -29,17 +29,17 @@ class NetworkManager {
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         return config
     }()
-    
+
     static let shared = NetworkManager()
-    private init() { }
+    private init() {}
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    
+
     func generateToken(channelName: String, uid: UInt = 0, success: @escaping () -> Void) {
         generateToken(channelName: channelName, uid: uid) { _ in
             success()
         }
     }
-    
+
     func generateToken(channelName: String, uid: UInt = 0, success: @escaping (String?) -> Void) {
         if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
             success(nil)
@@ -52,7 +52,7 @@ class NetworkManager {
                       "src": "iOS",
                       "ts": "".timeStamp,
                       "type": 1,
-                      "uid": "\(uid)"] as [String : Any]
+                      "uid": "\(uid)"] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
         NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token/generate", params: params, success: { response in
             let data = response["data"] as? [String: String]
@@ -67,18 +67,19 @@ class NetworkManager {
             ToastView.hidden()
         })
     }
-    
+
     func getRequest(urlString: String, success: SuccessClosure?, failure: FailClosure?) {
         DispatchQueue.global().async {
             self.request(urlString: urlString, params: nil, method: .GET, success: success, failure: failure)
         }
     }
+
     func postRequest(urlString: String, params: [String: Any]?, success: SuccessClosure?, failure: FailClosure?) {
         DispatchQueue.global().async {
             self.request(urlString: urlString, params: params, method: .POST, success: success, failure: failure)
         }
     }
-    
+
     /// 生成签名
     func generateSignature(params: [String: Any]?, token: String) -> String {
         guard let params = params else { return "" }
@@ -89,12 +90,13 @@ class NetworkManager {
         value += token
         return value.md5Encrypt
     }
-    
+
     private func request(urlString: String,
                          params: [String: Any]?,
                          method: HTTPMethods,
                          success: SuccessClosure?,
-                         failure: FailClosure?) {
+                         failure: FailClosure?)
+    {
         let session = URLSession(configuration: sessionConfig)
         guard let request = getRequest(urlString: urlString,
                                        params: params,
@@ -107,13 +109,13 @@ class NetworkManager {
             }
         }.resume()
     }
-    
+
     private func getRequest(urlString: String,
                             params: [String: Any]?,
                             method: HTTPMethods,
                             success: SuccessClosure?,
-                            failure: FailClosure?) -> URLRequest? {
-        
+                            failure: FailClosure?) -> URLRequest?
+    {
         let string = urlString.hasPrefix("http") ? urlString : baseUrl.appending(urlString)
         guard let url = URL(string: string) else {
             return nil
@@ -121,19 +123,19 @@ class NetworkManager {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         if method == .POST {
-            request.httpBody = try? JSONSerialization.data(withJSONObject: params ?? [], options: .sortedKeys)//convertParams(params: params).data(using: .utf8)
+            request.httpBody = try? JSONSerialization.data(withJSONObject: params ?? [], options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
         }
         let curl = request.cURL(pretty: true)
         debugPrint("curl == \(curl)")
         return request
     }
-    
+
     private func convertParams(params: [String: Any]?) -> String {
         guard let params = params else { return "" }
         let value = params.map({ String(format: "%@=%@", $0.key, "\($0.value)") }).joined(separator: "&")
         return value
     }
-    
+
     private func checkResponse(response: URLResponse?, data: Data?, success: SuccessClosure?, failure: FailClosure?) {
         if let httpResponse = response as? HTTPURLResponse {
             switch httpResponse.statusCode {
@@ -152,28 +154,28 @@ class NetworkManager {
     }
 }
 
-extension URLRequest {
-    public func cURL(pretty: Bool = false) -> String {
+public extension URLRequest {
+    func cURL(pretty: Bool = false) -> String {
         let newLine = pretty ? "\\\n" : ""
         let method = (pretty ? "--request " : "-X ") + "\(httpMethod ?? "GET") \(newLine)"
         let url: String = (pretty ? "--url " : "") + "\'\(url?.absoluteString ?? "")\' \(newLine)"
-        
+
         var cURL = "curl "
         var header = ""
-        var data: String = ""
-        
+        var data = ""
+
         if let httpHeaders = allHTTPHeaderFields, httpHeaders.keys.count > 0 {
-            for (key,value) in httpHeaders {
+            for (key, value) in httpHeaders {
                 header += (pretty ? "--header " : "-H ") + "\'\(key): \(value)\' \(newLine)"
             }
         }
-        
+
         if let bodyData = httpBody, let bodyString = String(data: bodyData, encoding: .utf8), !bodyString.isEmpty {
             data = "--data '\(bodyString)'"
         }
-        
+
         cURL += method + url + header + data
-        
+
         return cURL
     }
 }

@@ -12,6 +12,6 @@ class AgoraVoiceMusicModel: Codable {
     var url: String = ""
     var musicId: String = ""
     var musicName: String = ""
-    
+
     required init() {}
 }

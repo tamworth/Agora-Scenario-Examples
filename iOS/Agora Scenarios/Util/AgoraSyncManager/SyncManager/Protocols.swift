@@ -33,7 +33,7 @@ protocol ISyncManager {
              fail: FailBlock?)
     func update(reference: CollectionReference,
                 id: String,
-                data: [String : Any?],
+                data: [String: Any?],
                 success: SuccessBlockVoid?,
                 fail: FailBlock?)
     func delete(reference: CollectionReference,
@@ -59,7 +59,7 @@ protocol ISyncManager {
                    onSubscribed: OnSubscribeBlockVoid?,
                    fail: FailBlock?)
     func unsubscribe(reference: DocumentReference, key: String) -> Void
-    
+
     func subscribeScene(reference: SceneReference,
                         onUpdated: OnSubscribeBlock?,
                         onDeleted: OnSubscribeBlock?,

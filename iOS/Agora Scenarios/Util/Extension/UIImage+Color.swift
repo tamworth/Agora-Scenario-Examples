@@ -19,4 +19,3 @@ extension UIImage {
         return img
     }
 }
-

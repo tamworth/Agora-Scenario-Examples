@@ -5,47 +5,47 @@
 //  Created by zhaoyongqiang on 2022/1/26.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 enum AudioEffectType {
     case belCanto, soundEffect
-        
+
     var title: String {
         switch self {
-        case .belCanto:    return "bel_canto".localized
+        case .belCanto: return "bel_canto".localized
         case .soundEffect: return "sound_effect".localized
         }
     }
-    
+
     var segmentTitles: [String] {
         switch self {
         case .belCanto: return AgoraVoiceBelCantoType.allCases.map({ $0.title })
         case .soundEffect: return SoundEffectType.allCases.map({ $0.title })
         }
     }
-    
+
     func edges(belCantoType: AgoraVoiceBelCantoType, soundEffectType: SoundEffectType) -> UIEdgeInsets {
         switch self {
         case .belCanto: return belCantoType.edges
         case .soundEffect: return soundEffectType.edges
         }
     }
-    
-    func minInteritemSpacing(belCantoType: AgoraVoiceBelCantoType, soundEffectType: SoundEffectType) ->  CGFloat {
+
+    func minInteritemSpacing(belCantoType: AgoraVoiceBelCantoType, soundEffectType: SoundEffectType) -> CGFloat {
         switch self {
         case .belCanto: return belCantoType.minInteritemSpacing
         case .soundEffect: return soundEffectType.minInteritemSpacing
         }
     }
-    
+
     func minLineSpacing(belCantoType: AgoraVoiceBelCantoType, soundEffectType: SoundEffectType) -> CGFloat {
         switch self {
         case .belCanto: return belCantoType.minLineSpacing
         case .soundEffect: return soundEffectType.minLineSpacing
         }
     }
-    
+
     func layout(belCantoType: AgoraVoiceBelCantoType, soundEffectType: SoundEffectType) -> CGSize {
         switch self {
         case .belCanto: return belCantoType.layout
@@ -54,18 +54,18 @@ enum AudioEffectType {
     }
 }
 
-
 class AgoraVoiceBelCantoView: UIView {
     var didAgoraVoiceBelCantoItemClosure: ((AgoraVoiceBelCantoModel?) -> Void)?
     var didAgoraVoiceSoundEffectItemClosure: ((AgoraVoiceSoundEffectModel?, Int32) -> Void)?
     var onTapSwitchClosure: ((Bool) -> Void)?
-    
+
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .middle)
         label.text = "bel_canto".localized
         label.colorStyle = .white
         return label
     }()
+
     private lazy var segmentView: SegmentView = {
         let titles = AgoraVoiceBelCantoType.allCases.map({ $0.title })
         let segmentView = SegmentView(frame: CGRect(x: 0, y: 0, width: 300, height: 44), segmentStyle: .init(), titles: titles)
@@ -99,6 +99,7 @@ class AgoraVoiceBelCantoView: UIView {
         }
         return segmentView
     }()
+
     public lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         let belCantoType = AgoraVoiceBelCantoType(rawValue: 0) ?? .voice
@@ -114,28 +115,29 @@ class AgoraVoiceBelCantoView: UIView {
         view.emptyTopMargin = 40
         view.register(AgoraVoiceBelCantoViewCell.self,
                       forCellWithReuseIdentifier: AgoraVoiceBelCantoViewCell.description())
-        
+
         view.register(AgoraVoicePitchCorrectionHeaderView.self,
                       forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                       withReuseIdentifier: "pitchCorrectionHeaderView")
         return view
     }()
-    
+
     private var currentSoundType: SoundEffectType = .space
     private var currentType: AudioEffectType = .belCanto
     private var collectionViewHeightCons: NSLayoutConstraint?
     private var currentPitchValue: Int32 = 1
-    
+
     init(type: AudioEffectType) {
         super.init(frame: .zero)
         currentType = type
         setupUI()
     }
-        
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         backgroundColor = .init(hex: "#4F506A")
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -157,13 +159,14 @@ class AgoraVoiceBelCantoView: UIView {
         collectionView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
         collectionViewHeightCons = collectionView.heightAnchor.constraint(equalToConstant: currentType == .belCanto ? 200 : 240)
         collectionViewHeightCons?.isActive = true
-        
+
         collectionView.dataArray = currentType == .belCanto ? AgoraVoiceBelCantoType.voice.dataArray : SoundEffectType.space.dataArray
-        
+
         titleLabel.text = currentType.title
         segmentView.titles = currentType.segmentTitles
     }
 }
+
 extension AgoraVoiceBelCantoView: AGECollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AgoraVoiceBelCantoViewCell.description(), for: indexPath) as! AgoraVoiceBelCantoViewCell
@@ -175,7 +178,7 @@ extension AgoraVoiceBelCantoView: AGECollectionViewDelegate {
         }
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader && currentSoundType == .pitchCorrection {
             let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
@@ -189,12 +192,12 @@ extension AgoraVoiceBelCantoView: AGECollectionViewDelegate {
         }
         return UICollectionReusableView()
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         guard currentType == .soundEffect, currentSoundType == .pitchCorrection else { return .zero }
         return CGSize(width: Screen.width, height: 130)
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let model = self.collectionView.dataArray?[indexPath.item]
         if currentType == .belCanto {
@@ -214,11 +217,13 @@ class AgoraVoiceBelCantoViewCell: UICollectionViewCell {
         stackView.spacing = 5
         return stackView
     }()
+
     private lazy var imageView: AGEImageView = {
         let imageView = AGEImageView(imageName: "icon-大叔磁性")
         imageView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         return imageView
     }()
+
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .disabled, fontStyle: .small)
         label.text = "magnetism_male".localized
@@ -227,23 +232,25 @@ class AgoraVoiceBelCantoViewCell: UICollectionViewCell {
         label.textAlignment = .center
         return label
     }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupData(model: AgoraVoiceBelCantoModel?) {
         guard let model = model else {
             return
         }
         imageView.isHidden = model.imageName.isEmpty
-        
+
         titleLabel.text = model.title
-        
+
         if model.imageName.isEmpty {
             titleLabel.borderColor = .white
             titleLabel.borderWidth = 1
@@ -255,15 +262,15 @@ class AgoraVoiceBelCantoViewCell: UICollectionViewCell {
             titleLabel.fontStyle = .small
         }
     }
-    
+
     func setupData(model: AgoraVoiceSoundEffectModel?) {
         guard let model = model else {
             return
         }
         imageView.isHidden = model.imageName.isEmpty
-        
+
         titleLabel.text = model.title
-        
+
         if model.imageName.isEmpty {
             titleLabel.borderColor = .white
             titleLabel.borderWidth = 1
@@ -275,7 +282,7 @@ class AgoraVoiceBelCantoViewCell: UICollectionViewCell {
             titleLabel.fontStyle = .small
         }
     }
-    
+
     override var isSelected: Bool {
         didSet {
             if imageView.isHidden == false {
@@ -288,7 +295,7 @@ class AgoraVoiceBelCantoViewCell: UICollectionViewCell {
             }
         }
     }
-    
+
     private func setupUI() {
         statckView.translatesAutoresizingMaskIntoConstraints = false
         imageView.translatesAutoresizingMaskIntoConstraints = false

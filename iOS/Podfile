@@ -11,7 +11,7 @@ target 'Agora Scenarios' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
   inhibit_all_warnings!
-  
+
   pod 'MBProgressHUD', '~> 1.2.0'
 #  pod 'AgoraRtcEngine_iOS_Beta', '4.0.0-beta.2'
   pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
@@ -23,5 +23,6 @@ target 'Agora Scenarios' do
   pod 'AgoraRtm_iOS', '1.4.9'
   pod 'SocketRocket'
   pod 'Fastboard'
+  pod 'SwiftFormat/CLI'
 
 end

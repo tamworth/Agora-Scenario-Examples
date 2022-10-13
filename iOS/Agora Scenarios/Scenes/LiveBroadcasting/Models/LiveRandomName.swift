@@ -10,7 +10,7 @@ import UIKit
 struct LiveRandomName {
     static var list: [String] {
         var array: [String]
-        
+
         if DeviceAssistant.Language.isChinese {
             array = ["陌上花开等你来", "天天爱你", "我爱你们",
                      "有人可以", "风情万种", "强势归来",
@@ -28,7 +28,7 @@ struct LiveRandomName {
         }
         return array
     }
-    
+
     static func randomName() -> String {
         LiveRandomName.list.randomElement() ?? ""
     }

@@ -5,14 +5,14 @@
 //  Created by zhaoyongqiang on 2022/3/21.
 //
 
-import UIKit
 import Agora_Scene_Utils
 import AgoraRtcKit
+import UIKit
 
 class SeatView: UIView {
     var updateBottomTypeClosure: ((Bool) -> Void)?
     var updateUserStatusClosure: ((AgoraUsersModel) -> Void)?
-    
+
     private lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         let margin = (Screen.width - 4 * 80.fit - 15.fit * 2)
@@ -26,53 +26,57 @@ class SeatView: UIView {
                       forCellWithReuseIdentifier: AgoraVoiceUsersViewCell.description())
         return view
     }()
+
     private var channelName: String = ""
     private var currentRole: AgoraClientRole = .audience
     private var agoraKit: AgoraRtcEngineKit?
     private var channelMediaOptions: AgoraRtcChannelMediaOptions?
     private var connection: AgoraRtcConnection?
-        
+
     init(channelName: String,
          role: AgoraClientRole,
          agoraKit: AgoraRtcEngineKit?,
-         mediaOptions: AgoraRtcChannelMediaOptions?, connection: AgoraRtcConnection) {
+         mediaOptions: AgoraRtcChannelMediaOptions?, connection: AgoraRtcConnection)
+    {
         super.init(frame: .zero)
         self.channelName = channelName
-        self.currentRole = role
+        currentRole = role
         self.agoraKit = agoraKit
-        self.channelMediaOptions = mediaOptions
+        channelMediaOptions = mediaOptions
         self.connection = connection
         setupUI()
         eventHandler()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func reloadData() {
         collectionView.reloadData()
     }
-    
+
     func updateParams(channelName: String,
                       role: AgoraClientRole,
                       agoraKit: AgoraRtcEngineKit?,
                       mediaOptions: AgoraRtcChannelMediaOptions?,
-                      connection: AgoraRtcConnection) {
+                      connection: AgoraRtcConnection)
+    {
         SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).document().unsubscribe(key: "")
         self.channelName = channelName
-        self.currentRole = role
+        currentRole = role
         self.agoraKit = agoraKit
-        self.channelMediaOptions = mediaOptions
+        channelMediaOptions = mediaOptions
         self.connection = connection
         eventHandler()
     }
-    
+
     func fetchAgoraVoiceUserInfoData() {
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).get(success: { results in
             var tempArray = [Any]()
             let datas = results.compactMap({ $0.toJson() })
-                .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0 )})
+                .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0) })
                 .filter({ $0.status == .accept })
                 .sorted(by: { $0.timestamp < $1.timestamp })
             tempArray += datas
@@ -88,10 +92,10 @@ class SeatView: UIView {
             ToastView.show(text: error.message)
         })
     }
-    
+
     private func eventHandler() {
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).document().subscribe(key: "", onCreated: { object in
-            
+
         }, onUpdated: { object in
             guard var model = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson()) else { return }
             let controller = UIApplication.topMostViewController
@@ -100,18 +104,14 @@ class SeatView: UIView {
                 let cancel = UIAlertAction(title: "Cancel".localized, style: .cancel) { _ in
                     model.status = .refuse
                     let params = JSONObject.toJson(model)
-                    SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).update(id: model.objectId ?? "", data: params, success: {
-                        
-                    }, fail: { error in
+                    SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).update(id: model.objectId ?? "", data: params, success: {}, fail: { error in
                         ToastView.show(text: error.message)
                     })
                 }
-                let invite = UIAlertAction(title: /*上麦*/"Became_A_Host".localized, style: .default) { _ in
+                let invite = UIAlertAction(title: /* 上麦 */ "Became_A_Host".localized, style: .default) { _ in
                     model.status = .accept
                     let params = JSONObject.toJson(model)
-                    SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).update(id: model.objectId ?? "", data: params, success: {
-                        
-                    }, fail: { error in
+                    SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).update(id: model.objectId ?? "", data: params, success: {}, fail: { error in
                         ToastView.show(text: error.message)
                     })
                     self.updateUserStatusClosure?(model)
@@ -151,7 +151,7 @@ class SeatView: UIView {
             ToastView.show(text: error.message)
         })
     }
-    
+
     private func setupUI() {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(collectionView)
@@ -162,6 +162,7 @@ class SeatView: UIView {
         collectionView.heightAnchor.constraint(equalToConstant: 150.fit).isActive = true
     }
 }
+
 extension SeatView: AGECollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AgoraVoiceUsersViewCell.description(), for: indexPath) as! AgoraVoiceUsersViewCell
@@ -175,7 +176,7 @@ extension SeatView: AGECollectionViewDelegate {
             if userModel.userId == UserInfo.uid && userModel.isEnableVideo == true {
                 agoraKit?.setupLocalVideo(canvas)
                 agoraKit?.startPreview()
-                
+
             } else if userModel.userId != UserInfo.uid && userModel.isEnableVideo == true {
                 agoraKit?.setupRemoteVideoEx(canvas, connection: connection!)
             }
@@ -186,17 +187,16 @@ extension SeatView: AGECollectionViewDelegate {
         }
         return cell
     }
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard currentRole == .broadcaster, indexPath.item > 0 else { return }
         let model = self.collectionView.dataArray?[indexPath.item]
         let controller = UIApplication.topMostViewController
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let close = UIAlertAction(title: /*封麦*/"Seat_Close".localized, style: .destructive) { _ in
+        let close = UIAlertAction(title: /* 封麦 */ "Seat_Close".localized, style: .destructive) { _ in
             guard var userModel = model as? AgoraUsersModel else { return }
             userModel.status = .end
-            SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).update(id: userModel.objectId ?? "", data: JSONObject.toJson(userModel), success: {
-                
-            }, fail: { error in
+            SyncUtil.scene(id: self.channelName)?.collection(className: SYNC_MANAGER_AGORA_CLUB_USERS).update(id: userModel.objectId ?? "", data: JSONObject.toJson(userModel), success: {}, fail: { error in
                 ToastView.show(text: error.message)
             })
             self.updateUserStatusClosure?(userModel)

@@ -5,9 +5,9 @@
 //  Created by zhaoyongqiang on 2022/1/27.
 //
 
-import UIKit
 import Agora_Scene_Utils
 import AgoraRtcKit
+import UIKit
 
 class RTCRealTimeDataView: UIView {
     private lazy var detailLabel: AGELabel = {
@@ -15,31 +15,33 @@ class RTCRealTimeDataView: UIView {
         label.numberOfLines = 0
         return label
     }()
+
     private lazy var statistics = RTEStatistics()
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupData(channelStatus: AgoraChannelStats? = nil, localAudioStatus: AgoraRtcLocalAudioStats? = nil) {
         statistics.sceneStats = channelStatus
         statistics.localAudioStats = localAudioStatus
         detailLabel.text = statistics.description
     }
-    
+
     private func setupUI() {
         backgroundColor = .white
         layer.cornerRadius = 15
         layer.masksToBounds = true
         widthAnchor.constraint(equalToConstant: Screen.width - 30).isActive = true
-        
+
         detailLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(detailLabel)
-        
+
         detailLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15).isActive = true
         detailLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15).isActive = true
         detailLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -15).isActive = true

@@ -18,6 +18,7 @@ class ToastView: UIView {
         imageView.isHidden = true
         return imageView
     }()
+
     private lazy var label: UILabel = {
         let label = UILabel()
         label.text = ""
@@ -33,18 +34,20 @@ class ToastView: UIView {
             label.text = text
         }
     }
+
     var textColor: UIColor? {
         didSet {
             guard let color = textColor else { return }
             label.textColor = color
         }
     }
+
     var font: UIFont? {
         didSet {
             label.font = font ?? .systemFont(ofSize: 14)
         }
     }
-    
+
     var tagImage: UIImage? {
         didSet {
             guard tagImage != nil else { return }
@@ -52,17 +55,19 @@ class ToastView: UIView {
             tagImageView.isHidden = tagImage == nil
         }
     }
-    static private var currentToastView: ToastView?
-    
+
+    private static var currentToastView: ToastView?
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     static func showWait(text: String, view: UIView? = nil) {
         DispatchQueue.main.async {
             self.currentToastView?.removeFromSuperview()
@@ -76,9 +81,10 @@ class ToastView: UIView {
             showAnimation(toastView: toastView, isRemove: false)
         }
     }
+
     static func hidden(delay: CGFloat = 0.0) {
         if delay <= 0 {
-            self.currentToastView?.removeFromSuperview()
+            currentToastView?.removeFromSuperview()
             return
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -89,7 +95,7 @@ class ToastView: UIView {
             }
         }
     }
-    
+
     static func show(text: String, duration: CGFloat = 2.5, view: UIView? = nil) {
         DispatchQueue.main.async {
             let toastView = show(text: text, tagImage: nil,
@@ -99,7 +105,7 @@ class ToastView: UIView {
             showAnimation(toastView: toastView, duration: duration)
         }
     }
-    
+
     static func show(text: String, postion: ToastViewPostion = .center) {
         DispatchQueue.main.async {
             let toastView = show(text: text, tagImage: nil,
@@ -109,11 +115,12 @@ class ToastView: UIView {
             showAnimation(toastView: toastView)
         }
     }
-    
+
     static func show(text: String,
                      postion: ToastViewPostion = .center,
                      duration: CGFloat = 2.5,
-                     view: UIView? = nil) {
+                     view: UIView? = nil)
+    {
         DispatchQueue.main.async {
             let toastView = show(text: text, tagImage: nil,
                                  textColor: .white, font: nil,
@@ -122,25 +129,26 @@ class ToastView: UIView {
             showAnimation(toastView: toastView, duration: duration)
         }
     }
-    
+
     static func show(text: String, tagImage: UIImage? = nil, postion: ToastViewPostion = .center, view: UIView? = nil) {
         DispatchQueue.main.async {
             let toastView = show(text: text, tagImage: tagImage,
                                  textColor: .white, font: nil,
                                  postion: postion,
                                  view: view)
-            
+
             showAnimation(toastView: toastView)
         }
     }
-    
+
     @discardableResult
     static func show(text: String,
                      tagImage: UIImage? = nil,
                      textColor: UIColor = .white,
                      font: UIFont? = nil,
                      postion: ToastViewPostion = .center,
-                     view: UIView?) -> ToastView {
+                     view: UIView?) -> ToastView
+    {
         let toastView = ToastView()
         guard let currentView = view ?? UIViewController.toastKeyWindow else { return toastView }
         toastView.backgroundColor = UIColor.black.withAlphaComponent(0)
@@ -162,7 +170,7 @@ class ToastView: UIView {
         }
         return toastView
     }
-    
+
     private static func showAnimation(toastView: UIView, isRemove: Bool = true, duration: TimeInterval = 2.5) {
         UIView.animate(withDuration: 0.15) {
             toastView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
@@ -177,35 +185,36 @@ class ToastView: UIView {
             }
         }
     }
-    
+
     private func setupUI() {
         backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
         tagImageView.translatesAutoresizingMaskIntoConstraints = false
         label.translatesAutoresizingMaskIntoConstraints = false
         addSubview(tagImageView)
         addSubview(label)
-        
+
         tagImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         tagImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        
+
         label.leadingAnchor.constraint(equalTo: tagImageView.trailingAnchor, constant: 5).isActive = true
         label.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
         label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-        label.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -10).isActive = true
+        label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
     }
 }
+
 extension UIViewController {
     static var toastKeyWindow: UIWindow? {
         // Get connected scenes
         if #available(iOS 13.0, *) {
             return UIApplication.shared.connectedScenes
-            // Keep only active scenes, onscreen and visible to the user
+                // Keep only active scenes, onscreen and visible to the user
                 .filter { $0.activationState == .foregroundActive }
-            // Keep only the first `UIWindowScene`
+                // Keep only the first `UIWindowScene`
                 .first(where: { $0 is UIWindowScene })
-            // Get its associated windows
+                // Get its associated windows
                 .flatMap({ $0 as? UIWindowScene })?.windows
-            // Finally, keep only the key window
+                // Finally, keep only the key window
                 .first(where: \.isKeyWindow)
         } else {
             return UIApplication.keyWindow

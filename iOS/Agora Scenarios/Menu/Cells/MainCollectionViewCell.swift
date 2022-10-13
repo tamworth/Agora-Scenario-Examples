@@ -15,6 +15,7 @@ class MainCollectionViewCell: UICollectionViewCell {
         imageView.layer.cornerRadius = 5
         return imageView
     }()
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Single_Broadcaster".localized
@@ -22,32 +23,33 @@ class MainCollectionViewCell: UICollectionViewCell {
         label.font = .boldSystemFont(ofSize: 14)
         return label
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         bgImageView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
+
         contentView.addSubview(bgImageView)
         bgImageView.addSubview(titleLabel)
-        
+
         bgImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         bgImageView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         bgImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         bgImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        
+
         titleLabel.leadingAnchor.constraint(equalTo: bgImageView.leadingAnchor, constant: 12).isActive = true
         titleLabel.topAnchor.constraint(equalTo: bgImageView.topAnchor, constant: 10).isActive = true
     }
-    
+
     func setupData(model: MainModel) {
         titleLabel.text = model.title
         bgImageView.image = UIImage(named: model.imageNmae)

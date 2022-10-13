@@ -5,8 +5,8 @@
 //  Created by zhaoyongqiang on 2021/11/12.
 //
 
-import UIKit
 import Agora_Scene_Utils
+import UIKit
 
 class LiveGiftView: UIView {
     var onTapGiftItemClosure: ((LiveGiftModel) -> Void)?
@@ -17,11 +17,13 @@ class LiveGiftView: UIView {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
+
     private lazy var lineView: UIView = {
         let view = UIView()
         view.backgroundColor = .lightGray
         return view
     }()
+
     private lazy var collectionViewLayout: AGECollectionView = {
         let view = AGECollectionView()
         let w = (Screen.width - 30 - 60) / 4
@@ -36,6 +38,7 @@ class LiveGiftView: UIView {
         view.dataArray = LiveGiftModel.createGiftData()
         return view
     }()
+
     private lazy var presentButton: UIButton = {
         let button = UIButton()
         button.setTitle("Present".localized, for: .normal)
@@ -47,17 +50,19 @@ class LiveGiftView: UIView {
         button.addTarget(self, action: #selector(onTapPresentButton), for: .touchUpInside)
         return button
     }()
+
     private var currentModel: LiveGiftModel?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -68,34 +73,34 @@ class LiveGiftView: UIView {
         layer.cornerRadius = 10
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
-        
+
         addSubview(titleLabel)
         addSubview(lineView)
         addSubview(collectionViewLayout)
         addSubview(presentButton)
-        
+
         widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
-        
+
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15).isActive = true
-        
+
         lineView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         lineView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15).isActive = true
         lineView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
         lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        
+
         collectionViewLayout.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         collectionViewLayout.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        collectionViewLayout.topAnchor.constraint(equalTo: lineView.bottomAnchor,constant: 10).isActive = true
+        collectionViewLayout.topAnchor.constraint(equalTo: lineView.bottomAnchor, constant: 10).isActive = true
         collectionViewLayout.heightAnchor.constraint(equalToConstant: 235).isActive = true
-        
+
         presentButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         presentButton.topAnchor.constraint(equalTo: collectionViewLayout.bottomAnchor, constant: 25).isActive = true
         presentButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
         presentButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         presentButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
     }
-    
+
     @objc
     private func onTapPresentButton() {
         guard let model = currentModel else { return }
@@ -104,6 +109,7 @@ class LiveGiftView: UIView {
         }
     }
 }
+
 extension LiveGiftView: AGECollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LiveGidtViewCell.description(), for: indexPath) as! LiveGidtViewCell
@@ -115,7 +121,7 @@ extension LiveGiftView: AGECollectionViewDelegate {
         }
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.subviews.forEach({ ($0 as? UICollectionViewCell)?.isSelected = false })
         currentModel = LiveGiftModel.createGiftData()[indexPath.item]
@@ -130,6 +136,7 @@ class LiveGidtViewCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
         return imageView
     }()
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Small_Bell".localized
@@ -137,6 +144,7 @@ class LiveGidtViewCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         return label
     }()
+
     private lazy var descLabel: UILabel = {
         let label = UILabel()
         label.text = "(20" + "Coin".localized + ")"
@@ -144,45 +152,46 @@ class LiveGidtViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 14)
         return label
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         contentView.layer.cornerRadius = 8
         contentView.layer.masksToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         descLabel.translatesAutoresizingMaskIntoConstraints = false
-        
+
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(descLabel)
-        
+
         imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 1).isActive = true
-        
+
         titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8).isActive = true
-        
+
         descLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         descLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8).isActive = true
         descLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
-    
+
     func setliveGigtData(item: Any?) {
         guard let model = item as? LiveGiftModel else { return }
         imageView.image = UIImage(named: model.iconName ?? "")
         titleLabel.text = model.title
         descLabel.text = "(\(model.coin)" + "Coin".localized + ")"
     }
-    
+
     override var isSelected: Bool {
         didSet {
             contentView.layer.borderColor = UIColor.blueColor.cgColor

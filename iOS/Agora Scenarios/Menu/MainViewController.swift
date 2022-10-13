@@ -5,9 +5,9 @@
 //  Created by zhaoyongqiang on 2021/11/10.
 //
 
-import UIKit
-import AgoraRtcKit
 import Agora_Scene_Utils
+import AgoraRtcKit
+import UIKit
 
 enum SceneType: String {
     /// 单直播
@@ -19,24 +19,24 @@ enum SceneType: String {
     /// 音效
     case voiceChatRoom = "agoraVoice"
     /// 夜店
-    case agoraClub = "agoraClub"
+    case agoraClub
     /// PKApply
     case pkApply = "pkApplyInfo"
     /// 融合cdn
     case cdn = "PKByCDN"
     /// 多人连麦
-    case mutli = "mutli"
+    case mutli
     /// 电商
-    case shopping = "shopping"
+    case shopping
     /// 互动播客
-    case interactiveBlog = "interactiveBlog"
+    case interactiveBlog
     /// 教育1v1
     case education1v1 = "Education1v1"
     /// 小班课
     case smallClass = "SmallClass"
     /// 大班课
     case largeClass = "LargeClass"
-    
+
     var alertTitle: String {
         switch self {
         case .pkApply: return "PK_Recieved_Invite".localized
@@ -49,7 +49,7 @@ struct MainModel {
     var title: String = ""
     var imageNmae: String = ""
     var sceneType: SceneType = .singleLive
-    
+
     static func mainDatas() -> [[MainModel]] {
         var dataArray = [[MainModel]]()
         var tempArray = [MainModel]()
@@ -58,7 +58,7 @@ struct MainModel {
         model.imageNmae = "LiveSingle"
         model.sceneType = .singleLive
         tempArray.append(model)
-        
+
         model = MainModel()
         model.title = "sound_effect".localized
         model.imageNmae = "VideoCall"
@@ -70,7 +70,7 @@ struct MainModel {
         model.imageNmae = "Chatroom"
         model.sceneType = .voiceChatRoom
         tempArray.append(model)
-        
+
 //        model = MainModel()
 //        model.title = "PK_Live".localized
 //        model.imageNmae = "LivePK"
@@ -82,61 +82,60 @@ struct MainModel {
 //        model.imageNmae = "cdn"
 //        model.sceneType = .cdn
 //        tempArray.append(model)
-        
+
         model = MainModel()
         model.title = "Multi-person joint broadcasting".localized
         model.imageNmae = "mutli"
         model.sceneType = .mutli
         tempArray.append(model)
-        
+
         model = MainModel()
         model.title = "Interactive blog".localized
         model.imageNmae = "interactiveblog"
         model.sceneType = .interactiveBlog
         tempArray.append(model)
-        
+
         model = MainModel()
         model.title = "Shopping".localized
         model.imageNmae = "shopping"
         model.sceneType = .shopping
         tempArray.append(model)
-        
+
         dataArray.append(tempArray)
-        
+
         tempArray = [MainModel]()
 //        model = MainModel()
 //        model.title = "breakoutroom".localized
 //        model.imageNmae = "BreakoutRoom"
 //        model.sceneType = .breakoutRoom
 //        tempArray.append(model)
-        
+
         model = MainModel()
         model.title = "Education1v1".localized
         model.imageNmae = "Education1v1"
         model.sceneType = .education1v1
         tempArray.append(model)
-        
+
         model = MainModel()
         model.title = "Small Class".localized
         model.imageNmae = "SmallClass"
         model.sceneType = .smallClass
         tempArray.append(model)
-        
+
         model = MainModel()
 //        model.title = "Large Class".localized
 //        model.imageNmae = "LargeClass"
 //        model.sceneType = .largeClass
 //        tempArray.append(model)
         dataArray.append(tempArray)
-        
+
         return dataArray
     }
-    
+
     static func sceneId(type: SceneType) -> String {
         type.rawValue
     }
 }
-
 
 class MainViewController: BaseViewController {
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
@@ -146,6 +145,7 @@ class MainViewController: BaseViewController {
         config.areaCode = .global
         return config
     }()
+
     public lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
         let w = (Screen.width - 40) / 2
@@ -163,19 +163,20 @@ class MainViewController: BaseViewController {
                       withReuseIdentifier: MainHeaderViewCell.description())
         return view
     }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "home".localized
         setupUI()
 //        setupAgoraKit()
     }
-    
+
     private func setupAgoraKit() {
         let agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
         agoraKit.setParameters("{\"rtc.report_app_scenario\":{\"appScenario\":\(APP_SCENARIO),\"serviceType\":\(SERVICE_TYPE),\"appVersion\":\"\(AgoraRtcEngineKit.getSdkVersion())\"}}")
         agoraKit.setLogFile(LogUtils.sdkLogPath())
     }
-    
+
     private func setupUI() {
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -193,6 +194,7 @@ extension MainViewController: AGECollectionViewDelegate {
         cell.setupData(model: MainModel.mainDatas()[indexPath.section][indexPath.item])
         return cell
     }
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let sceneType = MainModel.mainDatas()[indexPath.section][indexPath.item].sceneType
         SyncUtil.initSyncManager(sceneId: sceneType.rawValue) {
@@ -204,12 +206,12 @@ extension MainViewController: AGECollectionViewDelegate {
             } else if sceneType == .agoraClub {
                 let clubProgramVC = AgoraClubProgramViewController()
                 self.navigationController?.pushViewController(clubProgramVC, animated: true)
-                
+
             } else if sceneType == .cdn {
                 let vc = CDNRoomListViewController(appId: KeyCenter.AppId)
                 vc.title = model.title
                 self.navigationController?.pushViewController(vc, animated: true)
-                
+
             } else {
                 let roomListVC = LiveRoomListController(sceneType: sceneType)
                 roomListVC.title = model.title
@@ -217,7 +219,7 @@ extension MainViewController: AGECollectionViewDelegate {
             }
         }
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
                                                                    withReuseIdentifier: MainHeaderViewCell.description(),
@@ -226,7 +228,7 @@ extension MainViewController: AGECollectionViewDelegate {
         view.setTitle(title: title)
         return view
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         CGSize(width: Screen.width, height: 40)
     }

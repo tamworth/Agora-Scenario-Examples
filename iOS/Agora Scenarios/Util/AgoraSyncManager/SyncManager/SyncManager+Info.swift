@@ -9,8 +9,8 @@ import Foundation
 
 public protocol ConfigProtocol {}
 
-extension AgoraSyncManager {
-    public struct RtmConfig: ConfigProtocol {
+public extension AgoraSyncManager {
+    struct RtmConfig: ConfigProtocol {
         let appId: String
         let channelName: String
         /// init for RtmConfig
@@ -18,13 +18,14 @@ extension AgoraSyncManager {
         ///   - appId: appId
         ///   - channelName: channelName
         public init(appId: String,
-                    channelName: String) {
+                    channelName: String)
+        {
             self.channelName = channelName
             self.appId = appId
         }
     }
-    
-    public struct AskConfig: ConfigProtocol {
+
+    struct AskConfig: ConfigProtocol {
         let appId: String
         let channelName: String
         /// init for RtmConfig
@@ -32,13 +33,14 @@ extension AgoraSyncManager {
         ///   - appId: appId
         ///   - channelName: channelName
         public init(appId: String,
-                    channelName: String) {
+                    channelName: String)
+        {
             self.channelName = channelName
             self.appId = appId
         }
     }
-    
-    public struct RethinkConfig: ConfigProtocol {
+
+    struct RethinkConfig: ConfigProtocol {
         let appId: String
         let channelName: String
         /// init for RtmConfig
@@ -46,7 +48,8 @@ extension AgoraSyncManager {
         ///   - appId: appId
         ///   - channelName: channelName
         public init(appId: String,
-                    channelName: String) {
+                    channelName: String)
+        {
             self.channelName = channelName
             self.appId = appId
         }

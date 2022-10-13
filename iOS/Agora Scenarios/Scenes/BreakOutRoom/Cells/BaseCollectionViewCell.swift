@@ -14,20 +14,21 @@ class BaseCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 14)
         return label
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupUI() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(titleLabel)
     }
-    
-    func setupItemData(with item: Any?) { }
+
+    func setupItemData(with item: Any?) {}
 }
