@@ -10,7 +10,7 @@ import AgoraRtcKit
 
 var interactiveBlogDownPullClosure: ((_ channelName: String, _ model: InteractiveBlogUsersModel?, _ agoraKit: AgoraRtcEngineKit?, _ role: AgoraClientRole) -> Void)?
 class InteractiveBlogController: BaseViewController {
-    
+    let service: InteractiveBlogService = InteractiveBlogService()
     public lazy var liveView: InteractiveBlogView = {
         let view = InteractiveBlogView(channelName: channleName, role: getRole(uid: UserInfo.uid), isAddUser: isAddUser)
         return view
@@ -42,6 +42,7 @@ class InteractiveBlogController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
         self.isAddUser = isAddUser
         self.channleName = channelName
+        self.service.channelName = channelName
         self.agoraKit = agoraKit
         self.currentUserId = userId
     }
@@ -117,33 +118,49 @@ class InteractiveBlogController: BaseViewController {
         }
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
-        }, onUpdated: { object in
-            
-        }, onDeleted: { object in
+//        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
+//
+//        }, onUpdated: { object in
+//
+//        }, onDeleted: { object in
+//            self.showAlert(title: "live_broadcast_over".localized, message: "") {
+//                self.navigationController?.popViewController(animated: true)
+//            }
+//        }, onSubscribed: {
+//
+//        }, fail: { error in
+//
+//        })
+        service.subscribeRoom {[weak self] (status, roomInfo) in
+            guard let self = self, status == .deleted else {
+                return
+            }
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
+        } onSubscribed: {
             
-        }, fail: { error in
+        } fail: { error in
             
-        })
+        }
+
     }
     
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
                 self?.leaveChannel()
-                SyncUtil.scene(id: self?.channleName ?? "")?.delete(success: nil, fail: nil)
-                SyncUtil.leaveScene(id: self?.channleName ?? "")
+//                SyncUtil.scene(id: self?.channleName ?? "")?.delete(success: nil, fail: nil)
+//                SyncUtil.leaveScene(id: self?.channleName ?? "")
+                self?.service.removeRoom()
+                self?.service.leave()
                 self?.navigationController?.popViewController(animated: true)
             }
 
         } else {
             leaveChannel()
-            SyncUtil.leaveScene(id: channleName)
+//            SyncUtil.leaveScene(id: channleName)
+            self.service.leave()
             navigationController?.popViewController(animated: true)
         }
     }
@@ -173,8 +190,9 @@ class InteractiveBlogController: BaseViewController {
         agoraKit?.disableAudio()
         agoraKit?.disableVideo()
         liveView.leave()
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.interactiveBlog.rawValue)
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SYNC_MANAGER_AGORA_VOICE_USERS)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.interactiveBlog.rawValue)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SYNC_MANAGER_AGORA_VOICE_USERS)
+        service.unsubscribe()
         agoraKit?.leaveChannel({ state in
             LogUtils.log(message: "leave channel: \(state)", level: .info)
         })

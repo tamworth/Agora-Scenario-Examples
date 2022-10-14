@@ -11,6 +11,7 @@ import Fastboard
 import Agora_Scene_Utils
 
 class SmallClassController: BaseViewController {
+    private let service: SmallClassService = SmallClassService()
     private lazy var fastRoom: FastRoom = {
         let config = FastRoomConfiguration(appIdentifier: BOARD_APP_ID,
                                            roomUUID: BOARD_ROOM_UUID,
@@ -99,6 +100,7 @@ class SmallClassController: BaseViewController {
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.channleName = channelName
+        self.service.channelName = channelName
         self.agoraKit = agoraKit
         self.currentUserId = userId
         avatarview.setName(with: channelName)
@@ -137,9 +139,10 @@ class SmallClassController: BaseViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel()
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.smallClass.rawValue)
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).document().unsubscribe(key: "")
-        SyncUtil.leaveScene(id: channleName)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.smallClass.rawValue)
+//        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).document().unsubscribe(key: "")
+//        SyncUtil.leaveScene(id: channleName)
+        service.leave()
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -194,53 +197,105 @@ class SmallClassController: BaseViewController {
     }
     
    private func getUserStatus() {
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { results in
-            let datas = results.compactMap({ $0.toJson() })
-                .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0 )})
-                .sorted(by: { $0.timestamp < $1.timestamp })
-            self.dataArray = datas
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
+//        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { results in
+//            let datas = results.compactMap({ $0.toJson() })
+//                .compactMap({ JSONObject.toModel(AgoraUsersModel.self, value: $0 )})
+//                .sorted(by: { $0.timestamp < $1.timestamp })
+//            self.dataArray = datas
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+       service.getUserStatus {[weak self] (error, datas) in
+           guard let self = self else {
+               return
+           }
+           
+           if let error = error {
+               ToastView.show(text: error.message)
+               return
+           }
+           
+           guard let datas = datas else {
+               return
+           }
+
+           self.dataArray = datas
+       }
     }
     
     public func eventHandler() {
-        SyncUtil.scene(id: channleName)?.subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION, onCreated: nil, onUpdated: { object in
-            guard let userInfo = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson()) else { return }
-            if let index = self.dataArray.firstIndex(where: { $0.userId == userInfo.userId }) {
-                self.dataArray[index] = userInfo
-            } else {
-                self.dataArray.append(userInfo)
+//        SyncUtil.scene(id: channleName)?.subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION, onCreated: nil, onUpdated: { object in
+//            guard let userInfo = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson()) else { return }
+//            if let index = self.dataArray.firstIndex(where: { $0.userId == userInfo.userId }) {
+//                self.dataArray[index] = userInfo
+//            } else {
+//                self.dataArray.append(userInfo)
+//            }
+//        }, onDeleted: { object in
+//            if let index = self.dataArray.firstIndex(where: { $0.objectId == object.getId() }) {
+//                self.dataArray.remove(at: index)
+//            }
+//        }, onSubscribed: nil, fail: { error in
+//            LogUtils.log(message: error.description, level: .error)
+//        })
+        
+        service.subscribeUser {[weak self] (status, userInfo) in
+            guard let self = self, let userInfo = userInfo else {
+                return
             }
-        }, onDeleted: { object in
-            if let index = self.dataArray.firstIndex(where: { $0.objectId == object.getId() }) {
-                self.dataArray.remove(at: index)
+            if status == .updated {
+                if let index = self.dataArray.firstIndex(where: { $0.userId == userInfo.userId }) {
+                    self.dataArray[index] = userInfo
+                } else {
+                    self.dataArray.append(userInfo)
+                }
+            } else if status == .deleted {
+                if let index = self.dataArray.firstIndex(where: { $0.userId == userInfo.userId }) {
+                    self.dataArray.remove(at: index)
+                }
             }
-        }, onSubscribed: nil, fail: { error in
+            
+        } onSubscribed: {
+            
+        } fail: { error in
             LogUtils.log(message: error.description, level: .error)
-        })
+        }
+
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
-        }, onUpdated: { object in
-            
-        }, onDeleted: { object in
+//        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
+//
+//        }, onUpdated: { object in
+//
+//        }, onDeleted: { object in
+//            self.showAlert(title: "live_broadcast_over".localized, message: "") {
+//                self.navigationController?.popViewController(animated: true)
+//            }
+//        }, onSubscribed: {
+//
+//        }, fail: { error in
+//
+//        })
+        service.subscribeRoom {[weak self] (status, roomInfo) in
+            guard let self = self, status == .deleted else {
+                return
+            }
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
+        } onSubscribed: {
             
-        }, fail: { error in
+        } fail: { error in
             
-        })
+        }
     }
     
     @objc
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+//                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.service.removeRoom()
                 self?.navigationController?.popViewController(animated: true)
             }
 
@@ -277,28 +332,49 @@ class SmallClassController: BaseViewController {
         agoraKit?.startPreview()
         fastRoom.joinRoom()
                 
-        let params = JSONObject.toJson(model)
-        SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: params, success: { object in
+//        let params = JSONObject.toJson(model)
+//        SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: params, success: { object in
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                self.getUserStatus()
+//            }
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.addUser(user: model) {[weak self] (error, user) in
+            guard let self = self else {
+                return
+            }
+            
+            if let error = error {
+                ToastView.show(text: error.message)
+                return
+            }
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.getUserStatus()
             }
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
+        }
     }
     
     private func leaveChannel() {
         guard let model = dataArray.first(where: { $0.userId == UserInfo.uid }) else { return }
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: model.objectId ?? "")
-            .delete(success: { objects in
+//        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+//            .document(id: model.objectId ?? "")
+//            .delete(success: { objects in
+//                LogUtils.log(message: "\(objects.count)", level: .info)
+//            }, fail: { error in
+//                LogUtils.log(message: error.description, level: .error)
+//            })
+//        agoraKit?.leaveChannel({ state in
+//            LogUtils.log(message: "leave channel: \(state)", level: .info)
+//        })
+        service.removeUser(user: model) { error, datas in
+            if let objects = datas {
                 LogUtils.log(message: "\(objects.count)", level: .info)
-            }, fail: { error in
+            } else if let error = error {
                 LogUtils.log(message: error.description, level: .error)
-            })
-        agoraKit?.leaveChannel({ state in
-            LogUtils.log(message: "leave channel: \(state)", level: .info)
-        })
+            }
+        }
     }
     
     @objc
@@ -309,9 +385,11 @@ class SmallClassController: BaseViewController {
         model.isEnableVideo = sender.isSelected
         dataArray[index] = model
         
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: model.objectId ?? "")
-            .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
+//        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+//            .document(id: model.objectId ?? "")
+//            .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
+        service.updateUser(user: model) { error, model in
+        }
         
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = .of(sender.isSelected)
@@ -325,9 +403,12 @@ class SmallClassController: BaseViewController {
         model.isEnableAudio = sender.isSelected
         dataArray[index] = model
         
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: model.objectId ?? "")
-            .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
+//        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+//            .document(id: model.objectId ?? "")
+//            .update(key: "", data: JSONObject.toJson(model), success: nil, fail: nil)
+        service.updateUser(user: model) { error, model in
+            
+        }
         
         let option = AgoraRtcChannelMediaOptions()
         option.publishMicrophoneTrack = .of(sender.isSelected)

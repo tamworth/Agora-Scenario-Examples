@@ -10,6 +10,7 @@ import AgoraRtcKit
 //import AgoraSyncManager
 
 class VoiceChatRoomCreateController: BaseViewController {
+    let service: VoiceChatRoomService = VoiceChatRoomService()
     private lazy var randomNameView: LiveRandomNameView = {
         let view = LiveRandomNameView()
         return view
@@ -146,18 +147,10 @@ class VoiceChatRoomCreateController: BaseViewController {
     }
     @objc
     private func onTapStartLiveButton() {
-        var roomInfo = LiveRoomInfo(roomName: randomNameView.text)
-        roomInfo.backgroundId = bgImageName
-        let params = JSONObject.toJson(roomInfo)
-        SyncUtil.joinScene(id: roomInfo.roomId, userId: roomInfo.userId, property: params, success: { result in
-            self.startLiveHandler(result: result)
-        })
-    }
-    
-    private func startLiveHandler(result: IObject) {
-        LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
-        let roomInfo = JSONObject.toModel(LiveRoomInfo.self, value: result.toJson())
-        NetworkManager.shared.generateToken(channelName: roomInfo?.roomId ?? "", uid: UserInfo.userId) {
+        service.join(roomName: randomNameView.text) {[weak self] (error, resp) in
+            guard let self = self, let roomInfo = resp else {
+                return
+            }
             let agoraVoiceVC = VoiceChatRoomController(roomInfo: roomInfo,
                                                        agoraKit: self.agoraKit)
             self.navigationController?.pushViewController(agoraVoiceVC, animated: true)

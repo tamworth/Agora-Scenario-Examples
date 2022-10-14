@@ -13,6 +13,7 @@ let BOARD_APP_ID: String = "283/VGiScM9Wiw2HJg"
 let BOARD_ROOM_UUID: String = "6d181120525e11ec89361798d9c15050"
 let BOARD_ROOM_TOKEN: String = "WHITEcGFydG5lcl9pZD15TFExM0tTeUx5VzBTR3NkJnNpZz0wZWIzMmY5M2IzMGUzZTBiMTQ4NzQ3NGVmZTRhNTlkNWM2MjY4ZjFjOmFrPXlMUTEzS1N5THlXMFNHc2QmY3JlYXRlX3RpbWU9MTYzODMzMjYwNTUwNiZleHBpcmVfdGltZT0xNjY5ODY4NjA1NTA2Jm5vbmNlPTE2MzgzMzI2MDU1MDYwMCZyb2xlPXJvb20mcm9vbUlkPTZkMTgxMTIwNTI1ZTExZWM4OTM2MTc5OGQ5YzE1MDUwJnRlYW1JZD05SUQyMFBRaUVldTNPNy1mQmNBek9n"
 class EducationController: BaseViewController {
+    private let service: EducationService = EducationService()
     private lazy var fastRoom: FastRoom = {
         let config = FastRoomConfiguration(appIdentifier: BOARD_APP_ID,
                                            roomUUID: BOARD_ROOM_UUID,
@@ -84,6 +85,7 @@ class EducationController: BaseViewController {
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.channleName = channelName
+        self.service.channelName = channelName
         self.agoraKit = agoraKit
         self.currentUserId = userId
         avatarview.setName(with: channelName)
@@ -122,8 +124,9 @@ class EducationController: BaseViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel(uid: UserInfo.userId, channelName: channleName, isExit: true)
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
-        SyncUtil.leaveScene(id: channleName)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
+//        SyncUtil.leaveScene(id: channleName)
+        service.leave()
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -208,28 +211,40 @@ class EducationController: BaseViewController {
         }
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
-        }, onUpdated: { object in
-            
-        }, onDeleted: { object in
+//        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
+//
+//        }, onUpdated: { object in
+//
+//        }, onDeleted: { object in
+//            self.showAlert(title: "live_broadcast_over".localized, message: "") {
+//                self.navigationController?.popViewController(animated: true)
+//            }
+//        }, onSubscribed: {
+//
+//        }, fail: { error in
+//
+//        })
+        service.subscribeRoom {[weak self] (status, roomInfo) in
+            guard let self = self, status == .deleted else {
+                return
+            }
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
+        } onSubscribed: {
             
-        }, fail: { error in
+        } fail: { error in
             
-        })
+        }
     }
     
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+//                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.service.removeRoom()
                 self?.navigationController?.popViewController(animated: true)
             }
-
         } else {
             navigationController?.popViewController(animated: true)
         }

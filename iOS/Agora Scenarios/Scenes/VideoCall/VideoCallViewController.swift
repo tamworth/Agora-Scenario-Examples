@@ -10,6 +10,7 @@ import Agora_Scene_Utils
 import AgoraRtcKit
 
 class VideoCallViewController: BaseViewController {
+    let service: VideoCallService = VideoCallService()
     private lazy var localContainerView: AGEView = {
         let view = AGEView()
         view.layer.shadowColor = UIColor.black.withAlphaComponent(0.6).cgColor
@@ -107,6 +108,7 @@ class VideoCallViewController: BaseViewController {
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.channleName = channelName
+        self.service.channleName = channelName
         self.agoraKit = agoraKit
         self.currentUserId = userId
     }
@@ -142,13 +144,16 @@ class VideoCallViewController: BaseViewController {
         super.viewDidDisappear(animated)
         leaveChannel(uid: UserInfo.userId, channelName: channleName, isExit: true)
         if !userObjectId.isEmpty {
-            SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).delete(id: userObjectId, success: nil, fail: nil)
+//            SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).delete(id: userObjectId, success: nil, fail: nil)
+            service.removeUser(userId: userObjectId)
         }
         if getRole(uid: UserInfo.uid) == .broadcaster {
-            SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).delete(success: nil, fail: nil)
+//            SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).delete(success: nil, fail: nil)
+            service.removeRoom()
         }
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
-        SyncUtil.leaveScene(id: channleName)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
+//        SyncUtil.leaveScene(id: channleName)
+        service.leave()
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -158,42 +163,68 @@ class VideoCallViewController: BaseViewController {
     }
     
     private func eventHandler() {
-        SyncUtil.scene(id: channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { list in
-            if list.count > 1 {
+        service.getAllUserList {[weak self] (error, list) in
+            guard let self = self else {
+                return
+            }
+            if let error = error {
+                self.showAlert(title: error.message, message: "") { [weak self] in
+                    self?.navigationController?.popViewController(animated: true)
+                }
+                return
+            }
+            
+            if list?.count ?? 0 > 1 {
                 self.showAlert(title: "房间人数已满", message: "") { [weak self] in
                     self?.navigationController?.popViewController(animated: true)
                 }
                 return
             }
             // 添加用户
-            SyncUtil.scene(id: self.channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: JSONObject.toJson(AgoraUsersModel()), success: { object in
-                self.userObjectId = object.getId()
-            }, fail: nil)
+            self.service.add(user: AgoraUsersModel()) { error, model in
+                if let error = error {
+                    self.showAlert(title: error.message, message: "") { [weak self] in
+                        self?.navigationController?.popViewController(animated: true)
+                    }
+                    return
+                }
+                guard let model = model else {
+                    return
+                }
+                self.userObjectId = model.userId
+            }
+//            SyncUtil.scene(id: self.channleName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: JSONObject.toJson(AgoraUsersModel()), success: { object in
+//                self.userObjectId = object.getId()
+//            }, fail: nil)
             self.joinChannel(channelName: self.channleName, uid: UserInfo.userId)
-        }, fail: { error in
-            Log.error(error: error.message, tag: "")
-        })
-
+        }
+        
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
-        }, onUpdated: { object in
-            
-        }, onDeleted: { [weak self] object in
+        service.subscribeRoomDidEnd { [weak self] (object) in
             self?.showAlert(title: "end_of_call".localized, message: "") {
                 self?.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
-            
-        }, fail: { error in
-            
-        })
+        }
+//        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
+//
+//        }, onUpdated: { object in
+//
+//        }, onDeleted: { [weak self] object in
+//            self?.showAlert(title: "end_of_call".localized, message: "") {
+//                self?.navigationController?.popViewController(animated: true)
+//            }
+//        }, onSubscribed: {
+//
+//        }, fail: { error in
+//
+//        })
     }
     
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "end_of_call".localized, message: "end_the_call".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+//                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.service.removeRoom()
                 self?.navigationController?.popViewController(animated: true)
             }
 

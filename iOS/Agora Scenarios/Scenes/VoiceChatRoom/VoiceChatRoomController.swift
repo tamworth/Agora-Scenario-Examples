@@ -10,6 +10,8 @@ import AgoraRtcKit
 //import AgoraSyncManager
 
 class VoiceChatRoomController: BaseViewController {
+    let service: VoiceChatRoomService = VoiceChatRoomService()
+
     /// 顶部头像昵称
     public lazy var avatarview = LiveAvatarView()
     /// 聊天
@@ -40,12 +42,18 @@ class VoiceChatRoomController: BaseViewController {
             guard let self = self else { return }
             self.view.layer.contents = UIImage(named: imageNmae)?.cgImage
             self.roomInfo?.backgroundId = imageNmae
-            let params = JSONObject.toJson(self.roomInfo)
-            SyncUtil.scene(id: self.channelName)?.update(key: "", data: params, success: { objects in
-                ToastView.show(text: "update successful")
-            }, fail: { error in
-                ToastView.show(text: error.message)
-            })
+            guard let roomInfo =  self.roomInfo else {
+                return
+            }
+            self.service.updateRoom(room: roomInfo) { (error, object) in
+                ToastView.show(text: error?.message ?? "update successful")
+            }
+//            let params = JSONObject.toJson(self.roomInfo)
+//            SyncUtil.scene(id: self.channelName)?.update(key: "", data: params, success: { objects in
+//                ToastView.show(text: "update successful")
+//            }, fail: { error in
+//                ToastView.show(text: error.message)
+//            })
         }
         return view
     }()
@@ -81,6 +89,7 @@ class VoiceChatRoomController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
         self.roomInfo = roomInfo
         self.channelName = roomInfo?.roomId ?? ""
+        self.service.channelName = self.channelName
         self.agoraKit = agoraKit
         self.currentUserId = roomInfo?.userId ?? ""
         view.backgroundColor = .clear
@@ -122,7 +131,8 @@ class VoiceChatRoomController: BaseViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         leaveChannel()
-        SyncUtil.leaveScene(id: channelName)
+//        SyncUtil.leaveScene(id: channelName)
+        service.leave()
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -150,24 +160,42 @@ class VoiceChatRoomController: BaseViewController {
         messageModel.content = "Join_Live_Room".localized
         messageModel.userName = UserInfo.uid
         chatView.sendMessage(messageModel: messageModel)
-        let params = JSONObject.toJson(AgoraUsersModel())
-        SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_VOICE_USERS).add(data: params, success: { object in
-            let model = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson())
+//        let params = JSONObject.toJson(AgoraUsersModel())
+//        SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_VOICE_USERS).add(data: params, success: { object in
+//            let model = JSONObject.toModel(AgoraUsersModel.self, value: object.toJson())
+//            self.currentUserModel = model
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.addUser(userInfo: AgoraUsersModel()) {[weak self] (error, model) in
+            guard let self = self else {
+                return
+            }
+            
+            if let error = error {
+                ToastView.show(text: error.message)
+                return
+            }
+            
             self.currentUserModel = model
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
+        }
     }
     
     private func leaveChannel() {
         agoraKit?.leaveChannel({ state in
             LogUtils.log(message: "leave channel state == \(state)", level: .info)
         })
-        SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_VOICE_USERS).delete(id: currentUserModel?.objectId ?? "", success: {
-            
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
+        
+        service.removeUser(userId: currentUserModel?.objectId ?? "") { error in
+            if let error = error {
+                ToastView.show(text: error.message)
+            }
+        }
+//        SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_VOICE_USERS).delete(id: currentUserModel?.objectId ?? "", success: {
+//
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
     }
     
     private func muteAudioHandler(isVoice: Bool) {
@@ -226,9 +254,12 @@ class VoiceChatRoomController: BaseViewController {
             guard let self = self else { return }
             var model = ChatMessageModel(content: message, messageType: .message)
             model.userName = UserInfo.uid
-            SyncUtil.scene(id: self.channelName)?
-                .collection(className: SYNC_SCENE_ROOM_MESSAGE_INFO)
-                .add(data: JSONObject.toJson(model), success: nil, fail: nil)
+//            SyncUtil.scene(id: self.channelName)?
+//                .collection(className: SYNC_SCENE_ROOM_MESSAGE_INFO)
+//                .add(data: JSONObject.toJson(model), success: nil, fail: nil)
+            self.service.sendMessage(messageInfo: model) { error, model in
+                
+            }
         }
         belCantoView.didAgoraVoiceBelCantoItemClosure = { [weak self] model in
             guard let self = self, let model = model else { return }
@@ -290,30 +321,62 @@ class VoiceChatRoomController: BaseViewController {
         }
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channelName)?.subscribe(key: "", onCreated: { object in
-
-        }, onUpdated: { object in
-            self.updateBGImage(object: object)
-        }, onDeleted: { object in
-            self.showAlert(title: "room_is_closed".localized, message: "") {
-                self.navigationController?.popViewController(animated: true)
+//        SyncUtil.scene(id: channelName)?.subscribe(key: "", onCreated: { object in
+//
+//        }, onUpdated: { object in
+//            guard let roomInfo = JSONObject.toModel(LiveRoomInfo.self, value: object.toJson()) else { return }
+//            self.updateBGImage(object: roomInfo)
+//        }, onDeleted: { object in
+//            self.showAlert(title: "room_is_closed".localized, message: "") {
+//                self.navigationController?.popViewController(animated: true)
+//            }
+//        }, onSubscribed: {
+//
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.subscribeRoom {[weak self] (status, roomInfo) in
+            switch status {
+            case .updated:
+                self?.updateBGImage(object: roomInfo)
+                break
+            case .deleted:
+                self?.showAlert(title: "room_is_closed".localized, message: "") {
+                    self?.navigationController?.popViewController(animated: true)
+                }
+                break
+            default:
+                break
             }
-        }, onSubscribed: {
+        } onSubscribed: {
+            
+        } fail: { error in
+            ToastView.show(text: error.message)
+        }
 
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
-        SyncUtil.scene(id: channelName)?.get(key: "", success: { object in
-            self.updateBGImage(object: object)
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
+//        SyncUtil.scene(id: channelName)?.get(key: "", success: { object in
+//            self.updateBGImage(object: object)
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.getRoom {[weak self] (error, object) in
+            guard let self = self else {
+                return
+            }
+            
+            if let object = object {
+                self.updateBGImage(object: object)
+                return
+            }
+            
+            ToastView.show(text: error?.message ?? "error occurred!")
+        }
     }
     
-    private func updateBGImage(object: IObject?) {
-        guard let roomInfo = JSONObject.toModel(LiveRoomInfo.self, value: object?.toJson()) else { return }
+    private func updateBGImage(object: LiveRoomInfo?) {
+        guard let roomInfo = object else { return }
         view.layer.contents = UIImage(named: roomInfo.backgroundId)?.cgImage
-        self.roomInfo = roomInfo
+        self.roomInfo = object
     }
     
     private func setupUI() {
@@ -361,7 +424,8 @@ class VoiceChatRoomController: BaseViewController {
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channelName ?? "")?.deleteScenes()
+//                SyncUtil.scene(id: self?.channelName ?? "")?.deleteScenes()
+                self?.service.removeRoom()
                 self?.navigationController?.popViewController(animated: true)
             }
 

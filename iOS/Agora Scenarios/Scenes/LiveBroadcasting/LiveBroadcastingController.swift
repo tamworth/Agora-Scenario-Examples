@@ -9,6 +9,7 @@ import UIKit
 import AgoraRtcKit
 
 class LiveBroadcastingController: BaseViewController {
+    lazy var service: LiveBroadcastingService = LiveBroadcastingService()
     public lazy var liveView: LiveBaseView = {
         let view = LiveBaseView(channelName: channleName, currentUserId: currentUserId)
         view.updateLiveLayout(postion: .full)
@@ -39,6 +40,7 @@ class LiveBroadcastingController: BaseViewController {
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.channleName = channelName
+        self.service.channleName = channleName
         self.agoraKit = agoraKit
         self.currentUserId = userId
     }
@@ -75,8 +77,9 @@ class LiveBroadcastingController: BaseViewController {
         super.viewDidDisappear(animated)
         leaveChannel(uid: UserInfo.userId, channelName: channleName, isExit: true)
         liveView.leave(channelName: channleName)
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
-        SyncUtil.leaveScene(id: channleName)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.singleLive.rawValue)
+//        SyncUtil.leaveScene(id: channleName)
+        service.leave()
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -116,25 +119,21 @@ class LiveBroadcastingController: BaseViewController {
         }
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribe(key: "", onCreated: { object in
-            
-        }, onUpdated: { object in
-            
-        }, onDeleted: { object in
+        service.subscribeRoomDidEnd {[weak self] (object) in
+            guard let self = self else {
+                return
+            }
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, onSubscribed: {
-            
-        }, fail: { error in
-            
-        })
+        }
     }
     
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+//                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.service.removeRoom()
                 self?.navigationController?.popViewController(animated: true)
             }
 

@@ -8,6 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		6C2CBAC9E9D072532C07954B /* Pods_Agora_Scenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3050406A978830E610F33C /* Pods_Agora_Scenarios.framework */; };
+		DD8BAD4D28F80D4C0050EC6D /* LiveBroadcastingServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD4C28F80D4C0050EC6D /* LiveBroadcastingServiceDelegate.swift */; };
+		DD8BAD4F28F80D850050EC6D /* LiveBroadcastingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD4E28F80D850050EC6D /* LiveBroadcastingService.swift */; };
+		DD8BAD5128F80E840050EC6D /* LiveBroadcastingServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5028F80E840050EC6D /* LiveBroadcastingServiceModel.swift */; };
+		DD8BAD5628F816360050EC6D /* VideoCallServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5328F816360050EC6D /* VideoCallServiceModel.swift */; };
+		DD8BAD5728F816360050EC6D /* VideoCallServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5428F816360050EC6D /* VideoCallServiceDelegate.swift */; };
+		DD8BAD5828F816360050EC6D /* VideoCallService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5528F816360050EC6D /* VideoCallService.swift */; };
+		DD8BAD5D28F848470050EC6D /* VoiceChatRoomServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5A28F848470050EC6D /* VoiceChatRoomServiceModel.swift */; };
+		DD8BAD5E28F848470050EC6D /* VoiceChatRoomService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5B28F848470050EC6D /* VoiceChatRoomService.swift */; };
+		DD8BAD5F28F848470050EC6D /* VoiceChatRoomServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD5C28F848470050EC6D /* VoiceChatRoomServiceDelegate.swift */; };
+		DD8BAD6428F918D30050EC6D /* MutliBroadcastingServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6128F918D30050EC6D /* MutliBroadcastingServiceModel.swift */; };
+		DD8BAD6528F918D30050EC6D /* MutliBroadcastingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6228F918D30050EC6D /* MutliBroadcastingService.swift */; };
+		DD8BAD6628F918D30050EC6D /* MutliBroadcastingServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6328F918D30050EC6D /* MutliBroadcastingServiceDelegate.swift */; };
+		DD8BAD6B28F9323C0050EC6D /* InteractiveBlogServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6828F9323C0050EC6D /* InteractiveBlogServiceDelegate.swift */; };
+		DD8BAD6C28F9323C0050EC6D /* InteractiveBlogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6928F9323C0050EC6D /* InteractiveBlogService.swift */; };
+		DD8BAD6D28F9323C0050EC6D /* InteractiveBlogServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6A28F9323C0050EC6D /* InteractiveBlogServiceModel.swift */; };
+		DD8BAD7228F949310050EC6D /* LiveShoppingServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD6F28F949310050EC6D /* LiveShoppingServiceDelegate.swift */; };
+		DD8BAD7328F949310050EC6D /* LiveShoppingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7028F949310050EC6D /* LiveShoppingService.swift */; };
+		DD8BAD7428F949310050EC6D /* LiveShoppingServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7128F949310050EC6D /* LiveShoppingServiceModel.swift */; };
+		DD8BAD7928F9960C0050EC6D /* EducationServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7628F9960C0050EC6D /* EducationServiceModel.swift */; };
+		DD8BAD7A28F9960C0050EC6D /* EducationServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7728F9960C0050EC6D /* EducationServiceDelegate.swift */; };
+		DD8BAD7B28F9960C0050EC6D /* EducationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7828F9960C0050EC6D /* EducationService.swift */; };
+		DD8BAD8028F998010050EC6D /* SmallClassServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7D28F998010050EC6D /* SmallClassServiceModel.swift */; };
+		DD8BAD8128F998010050EC6D /* SmallClassServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7E28F998010050EC6D /* SmallClassServiceDelegate.swift */; };
+		DD8BAD8228F998010050EC6D /* SmallClassService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BAD7F28F998010050EC6D /* SmallClassService.swift */; };
 		E710AE2F27A0F23300124356 /* ChangeRoomBgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E710AE2E27A0F23300124356 /* ChangeRoomBgView.swift */; };
 		E71A0782288F99D500CC4BF6 /* VideoCallCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E71A0781288F99D500CC4BF6 /* VideoCallCreateViewController.swift */; };
 		E71A0784288F9A3A00CC4BF6 /* VideoCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E71A0783288F9A3A00CC4BF6 /* VideoCallViewController.swift */; };
@@ -195,6 +219,30 @@
 		4C1A8B8E636109C2F8647D68 /* Pods-Agora-ScreenShare-Extension(Socket).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Agora-ScreenShare-Extension(Socket).debug.xcconfig"; path = "Target Support Files/Pods-Agora-ScreenShare-Extension(Socket)/Pods-Agora-ScreenShare-Extension(Socket).debug.xcconfig"; sourceTree = "<group>"; };
 		4EAC22A0ABCEA5BE7ED7FCFA /* Pods-Agora-ScreenShare-Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Agora-ScreenShare-Extension.release.xcconfig"; path = "Target Support Files/Pods-Agora-ScreenShare-Extension/Pods-Agora-ScreenShare-Extension.release.xcconfig"; sourceTree = "<group>"; };
 		C99DD6A332A83A34EF8B5943 /* Pods-Scene-Examples.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Scene-Examples.release.xcconfig"; path = "Target Support Files/Pods-Scene-Examples/Pods-Scene-Examples.release.xcconfig"; sourceTree = "<group>"; };
+		DD8BAD4C28F80D4C0050EC6D /* LiveBroadcastingServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveBroadcastingServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD4E28F80D850050EC6D /* LiveBroadcastingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBroadcastingService.swift; sourceTree = "<group>"; };
+		DD8BAD5028F80E840050EC6D /* LiveBroadcastingServiceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBroadcastingServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD5328F816360050EC6D /* VideoCallServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCallServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD5428F816360050EC6D /* VideoCallServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCallServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD5528F816360050EC6D /* VideoCallService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCallService.swift; sourceTree = "<group>"; };
+		DD8BAD5A28F848470050EC6D /* VoiceChatRoomServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatRoomServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD5B28F848470050EC6D /* VoiceChatRoomService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatRoomService.swift; sourceTree = "<group>"; };
+		DD8BAD5C28F848470050EC6D /* VoiceChatRoomServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatRoomServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD6128F918D30050EC6D /* MutliBroadcastingServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutliBroadcastingServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD6228F918D30050EC6D /* MutliBroadcastingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutliBroadcastingService.swift; sourceTree = "<group>"; };
+		DD8BAD6328F918D30050EC6D /* MutliBroadcastingServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutliBroadcastingServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD6828F9323C0050EC6D /* InteractiveBlogServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractiveBlogServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD6928F9323C0050EC6D /* InteractiveBlogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractiveBlogService.swift; sourceTree = "<group>"; };
+		DD8BAD6A28F9323C0050EC6D /* InteractiveBlogServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractiveBlogServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD6F28F949310050EC6D /* LiveShoppingServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveShoppingServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD7028F949310050EC6D /* LiveShoppingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveShoppingService.swift; sourceTree = "<group>"; };
+		DD8BAD7128F949310050EC6D /* LiveShoppingServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveShoppingServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD7628F9960C0050EC6D /* EducationServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EducationServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD7728F9960C0050EC6D /* EducationServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EducationServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD7828F9960C0050EC6D /* EducationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EducationService.swift; sourceTree = "<group>"; };
+		DD8BAD7D28F998010050EC6D /* SmallClassServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallClassServiceModel.swift; sourceTree = "<group>"; };
+		DD8BAD7E28F998010050EC6D /* SmallClassServiceDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallClassServiceDelegate.swift; sourceTree = "<group>"; };
+		DD8BAD7F28F998010050EC6D /* SmallClassService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallClassService.swift; sourceTree = "<group>"; };
 		E710AE2E27A0F23300124356 /* ChangeRoomBgView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeRoomBgView.swift; sourceTree = "<group>"; };
 		E71A0781288F99D500CC4BF6 /* VideoCallCreateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCallCreateViewController.swift; sourceTree = "<group>"; };
 		E71A0783288F9A3A00CC4BF6 /* VideoCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCallViewController.swift; sourceTree = "<group>"; };
@@ -405,9 +453,90 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DD8BAD4B28F80D4C0050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD4C28F80D4C0050EC6D /* LiveBroadcastingServiceDelegate.swift */,
+				DD8BAD4E28F80D850050EC6D /* LiveBroadcastingService.swift */,
+				DD8BAD5028F80E840050EC6D /* LiveBroadcastingServiceModel.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD5228F816360050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD5328F816360050EC6D /* VideoCallServiceModel.swift */,
+				DD8BAD5428F816360050EC6D /* VideoCallServiceDelegate.swift */,
+				DD8BAD5528F816360050EC6D /* VideoCallService.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD5928F848470050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD5A28F848470050EC6D /* VoiceChatRoomServiceModel.swift */,
+				DD8BAD5B28F848470050EC6D /* VoiceChatRoomService.swift */,
+				DD8BAD5C28F848470050EC6D /* VoiceChatRoomServiceDelegate.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD6028F918D30050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD6128F918D30050EC6D /* MutliBroadcastingServiceModel.swift */,
+				DD8BAD6228F918D30050EC6D /* MutliBroadcastingService.swift */,
+				DD8BAD6328F918D30050EC6D /* MutliBroadcastingServiceDelegate.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD6728F9323C0050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD6828F9323C0050EC6D /* InteractiveBlogServiceDelegate.swift */,
+				DD8BAD6928F9323C0050EC6D /* InteractiveBlogService.swift */,
+				DD8BAD6A28F9323C0050EC6D /* InteractiveBlogServiceModel.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD6E28F949310050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD6F28F949310050EC6D /* LiveShoppingServiceDelegate.swift */,
+				DD8BAD7028F949310050EC6D /* LiveShoppingService.swift */,
+				DD8BAD7128F949310050EC6D /* LiveShoppingServiceModel.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD7528F9960C0050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD7628F9960C0050EC6D /* EducationServiceModel.swift */,
+				DD8BAD7728F9960C0050EC6D /* EducationServiceDelegate.swift */,
+				DD8BAD7828F9960C0050EC6D /* EducationService.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
+		DD8BAD7C28F998010050EC6D /* Serivice */ = {
+			isa = PBXGroup;
+			children = (
+				DD8BAD7D28F998010050EC6D /* SmallClassServiceModel.swift */,
+				DD8BAD7E28F998010050EC6D /* SmallClassServiceDelegate.swift */,
+				DD8BAD7F28F998010050EC6D /* SmallClassService.swift */,
+			);
+			path = Serivice;
+			sourceTree = "<group>";
+		};
 		E71E7ADF2898C25F00B846C7 /* MultiJointBroadcasting */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD6028F918D30050EC6D /* Serivice */,
 				E71E7AF72898D20200B846C7 /* MutliView.swift */,
 				E71E7AE72898C25F00B846C7 /* MutliBroadcastingCreateController.swift */,
 				E71E7AE02898C25F00B846C7 /* MutliBroadcastingController.swift */,
@@ -418,6 +547,7 @@
 		E721601228D8122E006431BD /* Education1v1 */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD7528F9960C0050EC6D /* Serivice */,
 				E721601928D8122E006431BD /* EducationCreateController.swift */,
 				E721601A28D8122E006431BD /* EducationController.swift */,
 			);
@@ -427,6 +557,7 @@
 		E7218BA728BF7DA1005A01D5 /* Shopping */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD6E28F949310050EC6D /* Serivice */,
 				E7218BA928BF7DA1005A01D5 /* LiveShoppingCreateController.swift */,
 				E7218BA828BF7DA1005A01D5 /* LiveShoppingViewController.swift */,
 				E7218BB028C0B084005A01D5 /* LiveShoppingDetailViewController.swift */,
@@ -588,6 +719,7 @@
 		E748788A28AA198F00CA2F58 /* InteractiveBlog */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD6728F9323C0050EC6D /* Serivice */,
 				E748788F28AA212B00CA2F58 /* Views */,
 				E748788C28AA198F00CA2F58 /* InteractiveBlogCreateController.swift */,
 				E748788B28AA198F00CA2F58 /* InteractiveBlogController.swift */,
@@ -609,6 +741,7 @@
 		E763A884288F991B00FE99FA /* VideoCall */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD5228F816360050EC6D /* Serivice */,
 				E71A0781288F99D500CC4BF6 /* VideoCallCreateViewController.swift */,
 				E71A0783288F9A3A00CC4BF6 /* VideoCallViewController.swift */,
 			);
@@ -796,6 +929,7 @@
 		E79C2620273B7B5C00909CD4 /* LiveBroadcasting */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD4B28F80D4C0050EC6D /* Serivice */,
 				E79C2625273B7BDA00909CD4 /* LiveBroadcastingCreateController.swift */,
 				E79BEF30273D0EA4009FA838 /* LiveBroadcastingController.swift */,
 				E79C2622273B7B7F00909CD4 /* Models */,
@@ -858,6 +992,7 @@
 		E7BE804228E1462B007E3A84 /* SmallClass */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD7C28F998010050EC6D /* Serivice */,
 				E7BE804328E1462B007E3A84 /* SmallClassCreateController.swift */,
 				E7BE804428E1462B007E3A84 /* SmallClassController.swift */,
 			);
@@ -952,6 +1087,7 @@
 		E7EDBCA727A0F94800E763A6 /* VoiceChatRoom */ = {
 			isa = PBXGroup;
 			children = (
+				DD8BAD5928F848470050EC6D /* Serivice */,
 				E7377D93286EEA38008F6C62 /* VoiceChatRoomCreateController.swift */,
 				E7EDBCAB27A0F98900E763A6 /* VoiceChatRoomController.swift */,
 				E7EDBCAA27A0F97500E763A6 /* Models */,
@@ -1126,10 +1262,13 @@
 				E748788E28AA198F00CA2F58 /* InteractiveBlogCreateController.swift in Sources */,
 				E738A4F228F50DBD003C121E /* AgoraSyncManager.swift in Sources */,
 				E738A4FF28F50DBD003C121E /* Blocks.swift in Sources */,
+				DD8BAD6B28F9323C0050EC6D /* InteractiveBlogServiceDelegate.swift in Sources */,
 				E7D46065285C825D004F3C82 /* BaseCollectionViewCell.swift in Sources */,
 				E79C2611273B689B00909CD4 /* SyncUtil.swift in Sources */,
 				E7EDBCC627A3BDCD00E763A6 /* AgoraVoiceChangeBGModel.swift in Sources */,
 				E738A4F428F50DBD003C121E /* RtmSyncManager+Info.swift in Sources */,
+				DD8BAD7428F949310050EC6D /* LiveShoppingServiceModel.swift in Sources */,
+				DD8BAD5728F816360050EC6D /* VideoCallServiceDelegate.swift in Sources */,
 				E7D30F072845DC4A0062CFE3 /* CDNStorageManager.swift in Sources */,
 				E7EDBCBE27A2A41900E763A6 /* RTEStatistics.swift in Sources */,
 				E7D30F0F2845DC4A0062CFE3 /* CDNInvitationViewCell.swift in Sources */,
@@ -1140,20 +1279,27 @@
 				E71E7AF82898D20200B846C7 /* MutliView.swift in Sources */,
 				E728955D28E6D22B0013E7E6 /* LargeClassRaiseListView.swift in Sources */,
 				E79BEF8A274644A9009FA838 /* BORLiveModel.swift in Sources */,
+				DD8BAD8228F998010050EC6D /* SmallClassService.swift in Sources */,
 				E7218BB128C0B084005A01D5 /* LiveShoppingDetailViewController.swift in Sources */,
 				E79BEF45273E4D99009FA838 /* LiveGiftModel.swift in Sources */,
 				E79C264E273D062400909CD4 /* LiveRoomListCell.swift in Sources */,
 				E728955928E69C2A0013E7E6 /* LargeClassCreateController.swift in Sources */,
 				E7ECC56927E81A9E00EFA778 /* BaseNavigationController.swift in Sources */,
 				E721602628D8122E006431BD /* EducationController.swift in Sources */,
+				DD8BAD4D28F80D4C0050EC6D /* LiveBroadcastingServiceDelegate.swift in Sources */,
 				E79C264A273D003B00909CD4 /* LiveRoomInfo.swift in Sources */,
 				E79C262D273BC0CA00909CD4 /* ToastView.swift in Sources */,
 				E7EDBCB227A1463700E763A6 /* AgoraVoiceBelCantoModel.swift in Sources */,
+				DD8BAD7928F9960C0050EC6D /* EducationServiceModel.swift in Sources */,
+				DD8BAD8128F998010050EC6D /* SmallClassServiceDelegate.swift in Sources */,
 				E748789128AA214B00CA2F58 /* InteractiveBlogView.swift in Sources */,
 				E7D30F1C2845DC4A0062CFE3 /* CDNPlayerViewControllerAudience+RTC.swift in Sources */,
+				DD8BAD7A28F9960C0050EC6D /* EducationServiceDelegate.swift in Sources */,
 				E71E7AF32898C25F00B846C7 /* MutliBroadcastingCreateController.swift in Sources */,
+				DD8BAD6428F918D30050EC6D /* MutliBroadcastingServiceModel.swift in Sources */,
 				E7D30F182845DC4A0062CFE3 /* CDNRoomListViewController.swift in Sources */,
 				E76DE01D2809241200A0434C /* ClubRoomListView.swift in Sources */,
+				DD8BAD5128F80E840050EC6D /* LiveBroadcastingServiceModel.swift in Sources */,
 				E7D30F152845DC4A0062CFE3 /* CDNRoomListView.swift in Sources */,
 				E7D30F0B2845DC4A0062CFE3 /* CDNUserInfo.swift in Sources */,
 				E7377D962872CB94008F6C62 /* ClubCreateController.swift in Sources */,
@@ -1163,6 +1309,7 @@
 				E79BEF3B273D21FD009FA838 /* LiveChatView.swift in Sources */,
 				E7499C2C2770537C00E799FF /* MessageCell.swift in Sources */,
 				E79BEF3F273D3EF0009FA838 /* LiveToolView.swift in Sources */,
+				DD8BAD8028F998010050EC6D /* SmallClassServiceModel.swift in Sources */,
 				E7218BAD28BF7DA1005A01D5 /* LiveShoppingCreateController.swift in Sources */,
 				E777B3F5286C341100C8A0E7 /* CDNRoomListViewCell.swift in Sources */,
 				E7D30F162845DC4A0062CFE3 /* CDNMainView.swift in Sources */,
@@ -1187,9 +1334,12 @@
 				E7ECC56727E8155700EFA778 /* AgoraClubController.swift in Sources */,
 				E79BEF68274203ED009FA838 /* PKLiveInviteView.swift in Sources */,
 				E7EDBCB427A23EEF00E763A6 /* AgoraVoiceSoundEffectModel.swift in Sources */,
+				DD8BAD5E28F848470050EC6D /* VoiceChatRoomService.swift in Sources */,
 				E79BEF33273D0F0C009FA838 /* LiveCanvasModel.swift in Sources */,
 				E7499C2A2770534400E799FF /* NoticeCell.swift in Sources */,
+				DD8BAD7328F949310050EC6D /* LiveShoppingService.swift in Sources */,
 				E7D30F0A2845DC4A0062CFE3 /* CDNSyncUtil.swift in Sources */,
+				DD8BAD5F28F848470050EC6D /* VoiceChatRoomServiceDelegate.swift in Sources */,
 				E79C25E3273B67DB00909CD4 /* MainViewController.swift in Sources */,
 				E79C2612273B689B00909CD4 /* SegmentView.swift in Sources */,
 				E728955B28E6C18B0013E7E6 /* LargeClassView.swift in Sources */,
@@ -1209,14 +1359,19 @@
 				E757E65428126F400017D5B9 /* AgoraClubProgramModel.swift in Sources */,
 				E7EDBCC227A2B0F100E763A6 /* AgoraUsersModel.swift in Sources */,
 				E7D30F082845DC4A0062CFE3 /* UIViewController+Extension.swift in Sources */,
+				DD8BAD7228F949310050EC6D /* LiveShoppingServiceDelegate.swift in Sources */,
 				E7D30F112845DC4A0062CFE3 /* CDNCreateLiveView.swift in Sources */,
 				E79BEF6A27420933009FA838 /* PKApplyInfoModel.swift in Sources */,
 				E738A50028F50DBD003C121E /* Extensions.swift in Sources */,
 				E7ECC57127E8923200EFA778 /* Array+Extension.swift in Sources */,
 				E738A4F128F50DBD003C121E /* SyncManager+Info.swift in Sources */,
+				DD8BAD7B28F9960C0050EC6D /* EducationService.swift in Sources */,
 				E7EEF1BF2887A02D00D9D2AE /* KeyCenter.swift in Sources */,
+				DD8BAD6D28F9323C0050EC6D /* InteractiveBlogServiceModel.swift in Sources */,
 				E79BEF35273D1304009FA838 /* LivePlayerCell.swift in Sources */,
+				DD8BAD4F28F80D850050EC6D /* LiveBroadcastingService.swift in Sources */,
 				E721602528D8122E006431BD /* EducationCreateController.swift in Sources */,
+				DD8BAD6C28F9323C0050EC6D /* InteractiveBlogService.swift in Sources */,
 				E79BEF8527463FA5009FA838 /* BORHomeViewController.swift in Sources */,
 				E7D46063285C8244004F3C82 /* VideoCollectionViewCell.swift in Sources */,
 				E79C2636273BC6C400909CD4 /* LiveRandomNameView.swift in Sources */,
@@ -1225,13 +1380,16 @@
 				E7D30F0D2845DC4A0062CFE3 /* CDNPKInfo.swift in Sources */,
 				E7ECC56F27E8646600EFA778 /* SeatView.swift in Sources */,
 				E7D30F1D2845DC4A0062CFE3 /* CDNCreateLiveViewController.swift in Sources */,
+				DD8BAD6528F918D30050EC6D /* MutliBroadcastingService.swift in Sources */,
 				E7EDBCBA27A28BD300E763A6 /* AgoraVoiceMusicView.swift in Sources */,
 				E79BEFA1274796F7009FA838 /* NetworkManager.swift in Sources */,
 				E738A4F828F50DBD003C121E /* RethinkSyncManager.swift in Sources */,
 				E79BEF772745036E009FA838 /* PKLiveProgressView.swift in Sources */,
 				E7BE804528E1462B007E3A84 /* SmallClassCreateController.swift in Sources */,
 				E79BEF8427463FA5009FA838 /* BORCreateRoomController.swift in Sources */,
+				DD8BAD6628F918D30050EC6D /* MutliBroadcastingServiceDelegate.swift in Sources */,
 				E7D30F092845DC4A0062CFE3 /* String+Extension+SuperApp.swift in Sources */,
+				DD8BAD5828F816360050EC6D /* VideoCallService.swift in Sources */,
 				E7440E2C277420F200CBF4D8 /* LiveBaseView.swift in Sources */,
 				E71E7AED2898C25F00B846C7 /* MutliBroadcastingController.swift in Sources */,
 				E79C2628273B7D3700909CD4 /* LiveRandomName.swift in Sources */,
@@ -1245,6 +1403,7 @@
 				E7EDBCB827A284AB00E763A6 /* AgoraVoiceToolView.swift in Sources */,
 				E79BEF43273E3709009FA838 /* LiveGiftView.swift in Sources */,
 				E710AE2F27A0F23300124356 /* ChangeRoomBgView.swift in Sources */,
+				DD8BAD5628F816360050EC6D /* VideoCallServiceModel.swift in Sources */,
 				E7499C1B276A078500E799FF /* LiveOnlineView.swift in Sources */,
 				E7EDBCC027A2A4CA00E763A6 /* RTCRealTimeDataView.swift in Sources */,
 				E748788D28AA198F00CA2F58 /* InteractiveBlogController.swift in Sources */,
@@ -1262,6 +1421,7 @@
 				E79C25E1273B67DB00909CD4 /* SceneDelegate.swift in Sources */,
 				E738A4FA28F50DBD003C121E /* Protocols.swift in Sources */,
 				E7D30F192845DC4A0062CFE3 /* CDNPlayerViewControllerHost.swift in Sources */,
+				DD8BAD5D28F848470050EC6D /* VoiceChatRoomServiceModel.swift in Sources */,
 				E79BEF88274640A6009FA838 /* BORVideoRoomDetailCell.swift in Sources */,
 				E7D30F172845DC4A0062CFE3 /* CDNMainView+RemoteView.swift in Sources */,
 				E7EDBCAC27A0F98900E763A6 /* VoiceChatRoomController.swift in Sources */,
@@ -1428,7 +1588,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1244;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Agora Scenarios/Info.plist";
@@ -1466,7 +1626,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1244;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Agora Scenarios/Info.plist";

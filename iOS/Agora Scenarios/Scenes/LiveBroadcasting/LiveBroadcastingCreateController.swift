@@ -10,6 +10,7 @@ import AgoraRtcKit
 //import AgoraSyncManager
 
 class LiveBroadcastingCreateController: BaseViewController {
+    lazy var service: LiveBroadcastingService = LiveBroadcastingService()
     private lazy var randomNameView: LiveRandomNameView = {
         let view = LiveRandomNameView()
         return view
@@ -170,20 +171,13 @@ class LiveBroadcastingCreateController: BaseViewController {
     }
     @objc
     private func onTapStartLiveButton() {
-        let roomInfo = LiveRoomInfo(roomName: randomNameView.text)
-        let params = JSONObject.toJson(roomInfo)
-        SyncUtil.joinScene(id: roomInfo.roomId, userId: roomInfo.userId, property: params, success: { result in
-            self.startLiveHandler(result: result)
-        })
-    }
-    
-    private func startLiveHandler(result: IObject) {
-        LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
-        let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
-        
-        NetworkManager.shared.generateToken(channelName: channelName ?? "", uid: UserInfo.userId) {
-            let livePlayerVC = LiveBroadcastingController(channelName: channelName ?? "",
-                                                          userId: "\(UserInfo.userId)",
+        service.join(roomName: randomNameView.text) { [weak self] (error, resp) in
+            guard let self = self, let resp = resp else {
+                return
+            }
+            
+            let livePlayerVC = LiveBroadcastingController(channelName: resp.channelName,
+                                                          userId: resp.userId,
                                                           agoraKit: self.agoraKit)
             self.navigationController?.pushViewController(livePlayerVC, animated: true)
         }

@@ -9,6 +9,8 @@ import UIKit
 import AgoraRtcKit
 
 class LiveShoppingViewController: BaseViewController {
+    private let service: LiveShoppingService = LiveShoppingService()
+
     private lazy var liveView: LiveBaseView = {
         let view = LiveBaseView(channelName: channleName, currentUserId: currentUserId)
         view.updateLiveLayout(postion: .full)
@@ -79,6 +81,7 @@ class LiveShoppingViewController: BaseViewController {
     init(channelName: String, userId: String, agoraKit: AgoraRtcEngineKit? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.channleName = channelName
+        self.service.channelName = channelName
         self.agoraKit = agoraKit
         self.currentUserId = userId
     }
@@ -130,19 +133,25 @@ class LiveShoppingViewController: BaseViewController {
         
         leaveChannel(uid: UserInfo.userId, channelName: channleName, isExit: true)
         liveView.leave(channelName: channleName)
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.shopping.rawValue)
-        SyncUtil.leaveScene(id: channleName)
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SceneType.shopping.rawValue)
+//        SyncUtil.leaveScene(id: channleName)
+        service.leave()
         navigationTransparent(isTransparent: false)
         UIApplication.shared.isIdleTimerDisabled = false
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         
-        let channelName = pkApplyInfoModel?.targetRoomId ?? channleName
-        SyncUtil.scene(id: channleName)?.unsubscribe(key: SYNC_MANAGER_PK_INFO)
-        SyncUtil.scene(id: channelName)?.collection(className: SceneType.shopping.rawValue).delete(success: { _ in
-            
-        }, fail: { _ in
-            
-        })
+//        let channelName = pkApplyInfoModel?.targetRoomId ?? channleName
+//        SyncUtil.scene(id: channleName)?.unsubscribe(key: SYNC_MANAGER_PK_INFO)
+//        SyncUtil.scene(id: channelName)?.collection(className: SceneType.shopping.rawValue).delete(success: { _ in
+//            
+//        }, fail: { _ in
+//            
+//        })
+        if let targetRoomId = pkApplyInfoModel?.targetRoomId {
+            service.removePkApply(channelName: targetRoomId) { _, _ in
+            }
+        }
+        
         deleteSubscribe()
         agoraKit?.disableAudio()
         agoraKit?.disableVideo()
@@ -223,50 +232,97 @@ class LiveShoppingViewController: BaseViewController {
         
         if getRole(uid: "\(UserInfo.userId)") == .broadcaster {
             // 监听主播发起PK
-            SyncUtil.scene(id: channleName)?.subscribe(key: SceneType.shopping.rawValue, onCreated: { object in
-                
-            }, onUpdated: { object in
+//            SyncUtil.scene(id: channleName)?.subscribe(key: SceneType.shopping.rawValue, onCreated: { object in
+//
+//            }, onUpdated: { object in
+//                self.pkSubscribeHandler(object: object)
+//            }, onDeleted: { object in
+//
+//            }, onSubscribed: {
+//                LogUtils.log(message: "onSubscribed pkApplyInfo", level: .info)
+//            }, fail: { error in
+//                ToastView.show(text: error.message)
+//            })
+            
+            service.subscribeApply(channelName: channleName) {[weak self] (status, object) in
+                guard let self = self, status == .updated else {
+                    return
+                }
                 self.pkSubscribeHandler(object: object)
-            }, onDeleted: { object in
-                
-            }, onSubscribed: {
+            } onSubscribed: {
                 LogUtils.log(message: "onSubscribed pkApplyInfo", level: .info)
-            }, fail: { error in
+            } fail: { error in
                 ToastView.show(text: error.message)
-            })
+            }
         }
         // 监听PKinfo 让观众加入到PK的channel
-        SyncUtil.scene(id: channleName)?.subscribe(key: SYNC_MANAGER_PK_INFO, onCreated: { object in
-            guard self.getRole(uid: "\(UserInfo.userId)") == .audience,
-                  let model = JSONObject.toModel(PKInfoModel.self, value: object.toJson()) else { return }
-            if model.userId == "\(UserInfo.userId)" { return }
-            self.pkInfoModel = model
-            self.joinAudienceChannel(channelName: model.roomId, pkUid:  UInt(model.userId) ?? 0)
-        }, onUpdated: { object in
-            LogUtils.log(message: "onUpdated pkInfo == \(String(describing: object.toJson()))", level: .info)
-            guard self.getRole(uid: "\(UserInfo.userId)") == .audience,
-                  let model = JSONObject.toModel(PKInfoModel.self, value: object.toJson()) else { return }
-            if model.userId == "\(UserInfo.userId)" { return }
-            self.pkInfoModel = model
-            if model.status == .end {
-                if self.channleName != model.roomId {
-                    self.leaveChannel(uid: UserInfo.userId, channelName: model.roomId)
-                }
-                self.liveView.updateLiveLayout(postion: .full)
-                self.hiddenPkProgressView(isHidden: true)
-            } else {
-                self.joinAudienceChannel(channelName: model.roomId, pkUid:  UInt(model.userId) ?? 0)
-                self.liveView.updateLiveLayout(postion: .center)
-                self.hiddenPkProgressView(isHidden: false)
+//        SyncUtil.scene(id: channleName)?.subscribe(key: SYNC_MANAGER_PK_INFO, onCreated: { object in
+//            guard self.getRole(uid: "\(UserInfo.userId)") == .audience,
+//                  let model = JSONObject.toModel(PKInfoModel.self, value: object.toJson()) else { return }
+//            if model.userId == "\(UserInfo.userId)" { return }
+//            self.pkInfoModel = model
+//            self.joinAudienceChannel(channelName: model.roomId, pkUid:  UInt(model.userId) ?? 0)
+//        }, onUpdated: { object in
+//            LogUtils.log(message: "onUpdated pkInfo == \(String(describing: object.toJson()))", level: .info)
+//            guard self.getRole(uid: "\(UserInfo.userId)") == .audience,
+//                  let model = JSONObject.toModel(PKInfoModel.self, value: object.toJson()) else { return }
+//            if model.userId == "\(UserInfo.userId)" { return }
+//            self.pkInfoModel = model
+//            if model.status == .end {
+//                if self.channleName != model.roomId {
+//                    self.leaveChannel(uid: UserInfo.userId, channelName: model.roomId)
+//                }
+//                self.liveView.updateLiveLayout(postion: .full)
+//                self.hiddenPkProgressView(isHidden: true)
+//            } else {
+//                self.joinAudienceChannel(channelName: model.roomId, pkUid:  UInt(model.userId) ?? 0)
+//                self.liveView.updateLiveLayout(postion: .center)
+//                self.hiddenPkProgressView(isHidden: false)
+//            }
+//        }, onDeleted: { object in
+//
+//        }, onSubscribed: {
+//            LogUtils.log(message: "onSubscribed pkInfo", level: .info)
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.subscribePkInfo(channelName: channleName) {[weak self] (status, object) in
+            guard let self = self else {
+                return
             }
-        }, onDeleted: { object in
-            
-        }, onSubscribed: {
+            switch status {
+            case .created:
+                guard self.getRole(uid: "\(UserInfo.userId)") == .audience,
+                      let model = object else { return }
+                if model.userId == "\(UserInfo.userId)" { return }
+                self.pkInfoModel = model
+                self.joinAudienceChannel(channelName: model.roomId, pkUid:  UInt(model.userId) ?? 0)
+            case .updated:
+                LogUtils.log(message: "onUpdated pkInfo == \(object.debugDescription))", level: .info)
+                guard self.getRole(uid: "\(UserInfo.userId)") == .audience,
+                      let model = object else { return }
+                if model.userId == "\(UserInfo.userId)" { return }
+                self.pkInfoModel = model
+                if model.status == .end {
+                    if self.channleName != model.roomId {
+                        self.leaveChannel(uid: UserInfo.userId, channelName: model.roomId)
+                    }
+                    self.liveView.updateLiveLayout(postion: .full)
+                    self.hiddenPkProgressView(isHidden: true)
+                } else {
+                    self.joinAudienceChannel(channelName: model.roomId, pkUid:  UInt(model.userId) ?? 0)
+                    self.liveView.updateLiveLayout(postion: .center)
+                    self.hiddenPkProgressView(isHidden: false)
+                }
+            default:
+                break
+            }
+        } onSubscribed: {
             LogUtils.log(message: "onSubscribed pkInfo", level: .info)
-        }, fail: { error in
+        } fail: { error in
             ToastView.show(text: error.message)
-        })
-        
+        }
+
         liveView.onReceivedGiftClosure = { [weak self] giftModel, type in
             self?.receiveGiftHandler(giftModel: giftModel, type: type)
         }
@@ -276,20 +332,34 @@ class LiveShoppingViewController: BaseViewController {
         }
         
         guard getRole(uid: UserInfo.uid) == .audience else { return }
-        SyncUtil.scene(id: channleName)?.subscribeScene(onDeleted: { _ in
+//        SyncUtil.scene(id: channleName)?.subscribeScene(onDeleted: { _ in
+//            self.showAlert(title: "live_broadcast_over".localized, message: "") {
+//                self.navigationController?.popViewController(animated: true)
+//            }
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.subscribeRoom {[weak self] (status, roomInfo) in
+            guard let self = self, status == .deleted else {
+                return
+            }
             self.showAlert(title: "live_broadcast_over".localized, message: "") {
                 self.navigationController?.popViewController(animated: true)
             }
-        }, fail: { error in
+        } onSubscribed: {
+            
+        } fail: { error in
             ToastView.show(text: error.message)
-        })
+        }
+
     }
     
     private func onTapCloseLive() {
         if getRole(uid: UserInfo.uid) == .broadcaster {
             showAlert(title: "Live_End".localized, message: "Confirm_End_Live".localized) { [weak self] in
                 self?.closeLiveHandler()
-                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+//                SyncUtil.scene(id: self?.channleName ?? "")?.deleteScenes()
+                self?.service.removeRoom()
                 self?.navigationController?.popViewController(animated: true)
             }
 
@@ -317,9 +387,12 @@ class LiveShoppingViewController: BaseViewController {
         agoraKit?.startPreview()
     }
     
-    private func pkSubscribeHandler(object: IObject) {
-        LogUtils.log(message: "onUpdated pkApplyInfo == \(String(describing: object.toJson()))", level: .info)
-        guard var model = JSONObject.toModel(PKApplyInfoModel.self, value: object.toJson()) else { return }
+    private func pkSubscribeHandler(object: PKApplyInfoModel?) {
+//        LogUtils.log(message: "onUpdated pkApplyInfo == \(String(describing: object.toJson()))", level: .info)
+//        guard var model = JSONObject.toModel(PKApplyInfoModel.self, value: object.toJson()) else { return }
+        guard var model = object else {
+            return
+        }
         pkApplyInfoModel = model
         if model.status == .end {
             print("========== me end ==================")
@@ -335,11 +408,18 @@ class LiveShoppingViewController: BaseViewController {
             pkInfo.status = .end
             pkInfo.roomId = channleName
             pkInfo.userId = UserInfo.uid
-            SyncUtil.scene(id: channleName)?.update(key: SYNC_MANAGER_PK_INFO, data: JSONObject.toJson(pkInfo), success: { _ in
+//            SyncUtil.scene(id: channleName)?.update(key: SYNC_MANAGER_PK_INFO, data: JSONObject.toJson(pkInfo), success: { _ in
+//
+//            }, fail: { error in
+//                ToastView.show(text: error.message)
+//            })
+            service.updatePkInfo(info: pkInfo) { error, object in
+                guard let error = error else {
+                    return
+                }
                 
-            }, fail: { error in
                 ToastView.show(text: error.message)
-            })
+            }
             
         } else if model.status == .accept {
             liveView.updateLiveLayout(postion: .center)
@@ -357,30 +437,53 @@ class LiveShoppingViewController: BaseViewController {
             pkInfo.status = model.status
             pkInfo.roomId = channelName ?? ""
             pkInfo.userId = userId ?? ""
-            SyncUtil.scene(id: channleName)?.update(key: SYNC_MANAGER_PK_INFO, data: JSONObject.toJson(pkInfo), success: { results in
-                guard let result = results.first else { return }
-                guard let model = JSONObject.toModel(PKInfoModel.self, value: result.toJson()) else { return }
+//            SyncUtil.scene(id: channleName)?.update(key: SYNC_MANAGER_PK_INFO, data: JSONObject.toJson(pkInfo), success: { results in
+//                guard let result = results.first else { return }
+//                guard let model = JSONObject.toModel(PKInfoModel.self, value: result.toJson()) else { return }
+//                self.pkInfoModel = model
+//            }, fail: { error in
+//                ToastView.show(text: error.message)
+//            })
+            service.updatePkInfo(info: pkInfo) { [weak self] (error, model) in
+                guard let self = self else {
+                    return
+                }
+                
+                if let error = error {
+                    ToastView.show(text: error.message)
+                    return
+                }
+                
                 self.pkInfoModel = model
-            }, fail: { error in
-                ToastView.show(text: error.message)
-            })
+            }
             
         } else if model.status == .invite && "\(UserInfo.userId)" != model.userId {
             showAlert(title: SceneType.shopping.alertTitle, message: "") {
                 model.status = .refuse
-                SyncUtil.scene(id: model.targetRoomId ?? "")?.update(key: SceneType.shopping.rawValue, data: JSONObject.toJson(model), success: { _ in
-                    
-                }, fail: { error in
+//                SyncUtil.scene(id: model.targetRoomId ?? "")?.update(key: SceneType.shopping.rawValue, data: JSONObject.toJson(model), success: { _ in
+//
+//                }, fail: { error in
+//                    ToastView.show(text: error.message)
+//                })
+                self.service.updatePkApply(invitation: model) {[weak self] (error, model) in
+                    guard let _ = self, let error = error else {
+                        return
+                    }
                     ToastView.show(text: error.message)
-                })
-                
+                }
             } confirm: {
                 model.status = .accept
-                SyncUtil.scene(id: model.targetRoomId ?? "")?.update(key: SceneType.shopping.rawValue, data: JSONObject.toJson(model), success: { _ in
-                    
-                }, fail: { error in
+//                SyncUtil.scene(id: model.targetRoomId ?? "")?.update(key: SceneType.shopping.rawValue, data: JSONObject.toJson(model), success: { _ in
+//
+//                }, fail: { error in
+//                    ToastView.show(text: error.message)
+//                })
+                self.service.updatePkApply(invitation: model) {[weak self] (error, model) in
+                    guard let _ = self, let error = error else {
+                        return
+                    }
                     ToastView.show(text: error.message)
-                })
+                }
             }
         } else if model.status == .refuse && "\(UserInfo.userId)" == model.userId {
             showAlert(title: "PK_Invite_Reject".localized, message: "")
@@ -390,9 +493,25 @@ class LiveShoppingViewController: BaseViewController {
     
     /// 获取PK信息
     private func getBroadcastPKApplyInfo() {
-        SyncUtil.scene(id: channleName)?.get(key: SYNC_MANAGER_PK_INFO, success: { [weak self] result in
-            guard let self = self,
-                  let pkInfoModel = JSONObject.toModel(PKInfoModel.self, value: result?.toJson()) else { return }
+//        SyncUtil.scene(id: channleName)?.get(key: SYNC_MANAGER_PK_INFO, success: { [weak self] result in
+//            guard let self = self,
+//                  let pkInfoModel = JSONObject.toModel(PKInfoModel.self, value: result?.toJson()) else { return }
+//            self.pkInfoModel = pkInfoModel
+//            self.updatePKUIStatus(isStart: pkInfoModel.status == .accept)
+//            if pkInfoModel.status == .accept {
+//                self.joinAudienceChannel(channelName: pkInfoModel.roomId, pkUid: UInt(pkInfoModel.userId) ?? 0)
+//                self.liveView.updateLiveLayout(postion: .center)
+//            }
+//            self.getBroadcastPKStatus()
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        service.getPkInfo { [weak self] (error, pkInfoModel) in
+            guard let self = self, let pkInfoModel = pkInfoModel else {
+                ToastView.show(text: error?.message ?? "error")
+                return
+            }
+            
             self.pkInfoModel = pkInfoModel
             self.updatePKUIStatus(isStart: pkInfoModel.status == .accept)
             if pkInfoModel.status == .accept {
@@ -400,9 +519,7 @@ class LiveShoppingViewController: BaseViewController {
                 self.liveView.updateLiveLayout(postion: .center)
             }
             self.getBroadcastPKStatus()
-        }, fail: { error in
-            ToastView.show(text: error.message)
-        })
+        }
     }
     
     /// 获取当前主播PK状态
@@ -466,12 +583,19 @@ class LiveShoppingViewController: BaseViewController {
     private func updatePKInfoStatusToEnd() {
         guard var applyModel = pkApplyInfoModel else { return }
         applyModel.status = .end
-        let channelName = applyModel.targetRoomId ?? channleName
-        SyncUtil.scene(id: channelName)?.update(key: SceneType.shopping.rawValue, data: JSONObject.toJson(applyModel), success: { _ in
-            
-        }, fail: { error in
+//        let channelName = applyModel.targetRoomId ?? channleName
+//        SyncUtil.scene(id: channelName)?.update(key: SceneType.shopping.rawValue, data: JSONObject.toJson(applyModel), success: { _ in
+//
+//        }, fail: { error in
+//            ToastView.show(text: error.message)
+//        })
+        
+        service.updatePkApply(invitation: applyModel) {[weak self] (error, model) in
+            guard let error = error, let _ = self else {
+                return
+            }
             ToastView.show(text: error.message)
-        })
+        }
     }
     
     private func deleteSubscribe() {
@@ -479,9 +603,10 @@ class LiveShoppingViewController: BaseViewController {
         let channelName = pkApplyInfoModel?.targetRoomId ?? channleName
         if channelName != self.channleName {
             leaveChannel(uid: UserInfo.userId, channelName: channelName)
-            SyncUtil.scene(id: channelName)?.unsubscribe(key: SceneType.shopping.rawValue)
-            SyncUtil.scene(id: channelName)?.unsubscribe(key: SYNC_MANAGER_GIFT_INFO)
-            SyncUtil.leaveScene(id: channelName)
+//            SyncUtil.scene(id: channelName)?.unsubscribe(key: SceneType.shopping.rawValue)
+//            SyncUtil.scene(id: channelName)?.unsubscribe(key: SYNC_MANAGER_GIFT_INFO)
+//            SyncUtil.leaveScene(id: channelName)
+            service.leave(channelName: channelName)
         } else {
             guard let applyModel = pkApplyInfoModel else { return }
             leaveChannel(uid: UserInfo.userId, channelName: applyModel.roomId)
@@ -493,17 +618,28 @@ class LiveShoppingViewController: BaseViewController {
         pkInviteListView.pkInviteSubscribe = { [weak self] id in
             guard let self = self else { return }
             // 加入到对方的channel 订阅对方
-            SyncUtil.scene(id: id)?.subscribe(key: SceneType.shopping.rawValue, onCreated: { object in
-                
-            }, onUpdated: { object in
-                self.pkSubscribeHandler(object: object)
-            }, onDeleted: { object in
-                
-            }, onSubscribed: {
+//            SyncUtil.scene(id: id)?.subscribe(key: SceneType.shopping.rawValue, onCreated: { object in
+//
+//            }, onUpdated: { object in
+//                self.pkSubscribeHandler(object: object)
+//            }, onDeleted: { object in
+//
+//            }, onSubscribed: {
+//                LogUtils.log(message: "subscribe target pk apply info", level: .info)
+//            }, fail: { error in
+//                ToastView.show(text: error.message)
+//            })
+            self.service.subscribeApply(channelName: id) {[weak self] (status, roomInfo) in
+                guard let self = self, status == .updated else {
+                    return
+                }
+                self.pkSubscribeHandler(object: roomInfo)
+            } onSubscribed: {
                 LogUtils.log(message: "subscribe target pk apply info", level: .info)
-            }, fail: { error in
+            } fail: { error in
                 ToastView.show(text: error.message)
-            })
+            }
+
             // 订阅对方收到的礼物
             self.liveView.subscribeGift(channelName: id, type: .target)
         }
