@@ -55,7 +55,7 @@ extension VoiceChatRoomService: VoiceChatRoomServiceDelegate {
             return
         }
         let params = JSONObject.toJson(room)
-        SyncUtil.scene(id: channelName)?.collection(className: SYNC_MANAGER_AGORA_VOICE_USERS).add(data: params, success: { object in
+        SyncUtil.scene(id: channelName)?.collection(className: "").add(data: params, success: { object in
             let model = JSONObject.toModel(LiveRoomInfo.self, value: object.toJson())
             completion(nil, model)
         }, fail: { error in
